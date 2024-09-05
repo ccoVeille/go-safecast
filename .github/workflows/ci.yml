@@ -23,3 +23,18 @@ jobs:
 
       - name: editorconfig-checker-action
         uses: editorconfig-checker/action-editorconfig-checker@v2
+
+  go-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout-action
+        uses: actions/checkout@v4.1.7
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+
+      - name: Run go test
+        run: go test -v ./...
+
+      - name: Launch golangci-lint
+        uses: golangci/golangci-lint-action@v6.1.0
