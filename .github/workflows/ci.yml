@@ -36,5 +36,13 @@ jobs:
       - name: Run tests
         run: go test
 
+      - name: Code Climate Coverage Action
+        uses: paambaati/codeclimate-action@v9
+        env:
+          CC_TEST_REPORTER_ID: ${{ secrets.CODE_CLIMATE_REPORTER_ID }}
+        with:
+          coverageLocations: coverage.txt:gocov
+          prefix: github.com/ccoveille/go-safecast
+
       - name: Launch golangci-lint
         uses: golangci/golangci-lint-action@v6.1.0
