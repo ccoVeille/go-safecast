@@ -32,6 +32,10 @@ func ToInt[T Number](i T) (int, error) {
 // If the conversion results in a value outside the range of an uint,
 // an ErrOutOfRange error is returned.
 func ToUint[T Number](i T) (uint, error) {
+	if err := assertNotNegative(i); err != nil {
+		return 0, err
+	}
+
 	return uint(i), nil
 }
 
