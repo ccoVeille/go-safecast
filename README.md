@@ -48,7 +48,7 @@ func main() {
 
   a = 2147483647 + 1
   b = int32(a)
-  fmt.Println(b) // -2147483648 Stack overflow
+  fmt.Println(b) // -2147483648 integer overflow
 
   c := -1
   d := uint32(c)
@@ -58,13 +58,23 @@ func main() {
 
 GoPlay: [https://go.dev/play/p/9PRWI7e0x1T](https://go.dev/play/p/9PRWI7e0x1T)
 
+### What is the problem ?
+
+[CWE-190](https://cwe.mitre.org/data/definitions/190.html) explains in detail.
+
+But to sum it up, you can face:
+
+- infinite loop
+- access to wrong resource by id
+- grant access to someone who exhausted their quota
+
 ## Motivation
 
 The gosec G115 will now report issues in a lot of project.
 
-Some libraries existed (See [alternatives](#alternatives) section), but they were not able to cover all the use cases.
-
 ## Alternatives
+
+Some libraries existed, but they were not able to cover all the use cases.
 
 - [github.com/rung/go-safecast](https://github.com/rung/go-safecast):
   Unmaintained, not architecture agnostic, do not support uint -> int conversion
