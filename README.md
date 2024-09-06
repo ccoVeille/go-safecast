@@ -1,5 +1,10 @@
 # Go SafeCast
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/ccoveille/go-safecast)](https://goreportcard.com/report/github.com/ccoveille/go-safecast)
+[![GoDoc](https://godoc.org/github.com/ccoVeille/go-safecast?status.svg)](https://godoc.org/github.com/ccoVeille/go-safecast)
+[![codecov](https://codecov.io/gh/ccoVeille/go-safecast/graph/badge.svg?token=VW0VO503U6)](https://codecov.io/gh/ccoVeille/go-safecast)
+[![Code Climate](https://codeclimate.com/github/ccoVeille/go-safecast.png)](https://codeclimate.com/github/ccoVeille/go-safecast)
+
 ## Origin of this project
 
 In Go, integer type conversion can lead to unexpected behavior and errors if not handled carefully.
