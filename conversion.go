@@ -10,9 +10,19 @@ import (
 	"math"
 )
 
-// Number is an alias for the int, uint, int8, uint8, int16, uint16, int32, uint32, int64, and uint64 types.
-type Number interface {
+// Integer is an alias for the int, uint, int8, uint8, int16, uint16, int32, uint32, int64, and uint64 types.
+type Integer interface {
 	~int | ~uint | ~int8 | ~uint8 | ~int16 | ~uint16 | ~int32 | ~uint32 | ~int64 | ~uint64
+}
+
+// Float is an alias for the float32 and float64 types.
+type Float interface {
+	~float32 | ~float64
+}
+
+// Number is an alias for the int, uint, int8, uint8, int16, uint16, int32, uint32, int64, uint64, float32, and float64 types.
+type Number interface {
+	Integer | Float
 }
 
 var ErrOutOfRange = errors.New("out of range")
@@ -34,6 +44,10 @@ func ToInt[T Number](i T) (int, error) {
 func ToUint[T Number](i T) (uint, error) {
 	if err := assertNotNegative(i); err != nil {
 		return 0, err
+	}
+
+	if float64(i) > math.MaxUint64 {
+		return 0, fmt.Errorf("%w: %v is greater than math.MaxUint64", ErrOutOfRange, i)
 	}
 
 	return uint(i), nil
@@ -146,6 +160,10 @@ func ToInt64[T Number](i T) (int64, error) {
 func ToUint64[T Number](i T) (uint64, error) {
 	if err := assertNotNegative(i); err != nil {
 		return 0, err
+	}
+
+	if float64(i) > math.MaxUint64 {
+		return 0, fmt.Errorf("%w: %v is greater than math.MaxUint64", ErrOutOfRange, i)
 	}
 
 	return uint64(i), nil
