@@ -1229,11 +1229,27 @@ func assertUintOK[in safecast.Number](t *testing.T, tests []caseUint[in]) {
 	}
 }
 
+func assertUintError[in safecast.Number](t *testing.T, tests []caseUint[in]) {
+	t.Helper()
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := safecast.ToUint(tt.input)
+			requireError(t, err)
+			assertEqual(t, tt.want, got)
+		})
+	}
+}
+
 func TestToUint(t *testing.T) {
 	t.Run("from int", func(t *testing.T) {
 		assertUintOK(t, []caseUint[int]{
 			{name: "zero", input: 0, want: 0},
 			{name: "positive within range", input: 10000, want: 10000},
+		})
+
+		assertUintError(t, []caseUint[int]{
+			{name: "negative value", input: -1},
 		})
 	})
 
@@ -1242,12 +1258,20 @@ func TestToUint(t *testing.T) {
 			{name: "zero", input: 0, want: 0},
 			{name: "positive within range", input: 100, want: 100},
 		})
+
+		assertUintError(t, []caseUint[int8]{
+			{name: "negative value", input: -1},
+		})
 	})
 
 	t.Run("from int16", func(t *testing.T) {
 		assertUintOK(t, []caseUint[int16]{
 			{name: "zero", input: 0, want: 0},
 			{name: "positive within range", input: 10000, want: 10000},
+		})
+
+		assertUintError(t, []caseUint[int16]{
+			{name: "negative value", input: -1},
 		})
 	})
 
@@ -1256,12 +1280,20 @@ func TestToUint(t *testing.T) {
 			{name: "zero", input: 0, want: 0},
 			{name: "positive within range", input: 10000, want: 10000},
 		})
+
+		assertUintError(t, []caseUint[int32]{
+			{name: "negative value", input: -1},
+		})
 	})
 
 	t.Run("from int64", func(t *testing.T) {
 		assertUintOK(t, []caseUint[int64]{
 			{name: "zero", input: 0, want: 0},
 			{name: "positive within range", input: 10000, want: 10000},
+		})
+
+		assertUintError(t, []caseUint[int64]{
+			{name: "negative value", input: -1},
 		})
 	})
 
