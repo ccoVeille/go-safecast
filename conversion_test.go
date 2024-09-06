@@ -233,12 +233,21 @@ func TestToUint8(t *testing.T) {
 			{name: "zero", input: 0, want: 0},
 			{name: "positive within range", input: 100, want: 100},
 		})
+
+		assertUint8Error(t, []caseUint8[int8]{
+			{name: "negative value", input: -1},
+		})
 	})
 
 	t.Run("from int16", func(t *testing.T) {
 		assertUint8OK(t, []caseUint8[int16]{
 			{name: "zero", input: 0, want: 0},
 			{name: "positive within range", input: 100, want: 100},
+		})
+
+		assertUint8Error(t, []caseUint8[int16]{
+			{name: "positive out of range", input: 10000},
+			{name: "negative value", input: -1},
 		})
 	})
 
@@ -983,11 +992,27 @@ func assertUint64OK[in safecast.Number](t *testing.T, tests []caseUint64[in]) {
 	}
 }
 
+func assertUint64Error[in safecast.Number](t *testing.T, tests []caseUint64[in]) {
+	t.Helper()
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := safecast.ToUint64(tt.input)
+			requireError(t, err)
+			assertEqual(t, tt.want, got)
+		})
+	}
+}
+
 func TestToUint64(t *testing.T) {
 	t.Run("from int", func(t *testing.T) {
 		assertUint64OK(t, []caseUint64[int]{
 			{name: "zero", input: 0, want: 0},
 			{name: "positive within range", input: 10000, want: 10000},
+		})
+
+		assertUint64Error(t, []caseUint64[int]{
+			{name: "negative value", input: -1},
 		})
 	})
 
@@ -996,12 +1021,20 @@ func TestToUint64(t *testing.T) {
 			{name: "zero", input: 0, want: 0},
 			{name: "positive within range", input: 100, want: 100},
 		})
+
+		assertUint64Error(t, []caseUint64[int]{
+			{name: "negative value", input: -1},
+		})
 	})
 
 	t.Run("from int16", func(t *testing.T) {
 		assertUint64OK(t, []caseUint64[int16]{
 			{name: "zero", input: 0, want: 0},
 			{name: "positive within range", input: 10000, want: 10000},
+		})
+
+		assertUint64Error(t, []caseUint64[int]{
+			{name: "negative value", input: -1},
 		})
 	})
 
@@ -1010,12 +1043,20 @@ func TestToUint64(t *testing.T) {
 			{name: "zero", input: 0, want: 0},
 			{name: "positive within range", input: 10000, want: 10000},
 		})
+
+		assertUint64Error(t, []caseUint64[int]{
+			{name: "negative value", input: -1},
+		})
 	})
 
 	t.Run("from int64", func(t *testing.T) {
 		assertUint64OK(t, []caseUint64[int64]{
 			{name: "zero", input: 0, want: 0},
 			{name: "positive within range", input: 10000, want: 10000},
+		})
+
+		assertUint64Error(t, []caseUint64[int]{
+			{name: "negative value", input: -1},
 		})
 	})
 
