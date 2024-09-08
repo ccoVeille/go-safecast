@@ -1,15 +1,17 @@
 package safecast
 
-import "fmt"
-
-func assertNotNegative[T Type](value T) error {
-	if value < 0 {
-		return fmt.Errorf("%w: %v is negative", ErrConversionIssue, value)
+func assertNotNegative[T Type, T2 Type](i T, zero T2) error {
+	if i < 0 {
+		return Error{
+			err:      ErrExceedMinimumValue,
+			value:    i,
+			boundary: zero,
+		}
 	}
 	return nil
 }
 
-func checkUpperBoundary[T Type](value T, boundary uint64) error {
+func checkUpperBoundary[T Type, T2 Type](value T, boundary T2) error {
 	if value <= 0 {
 		return nil
 	}
@@ -27,17 +29,21 @@ func checkUpperBoundary[T Type](value T, boundary uint64) error {
 		greater = float64(f) >= float64(boundary)
 	default:
 		// for all other integer types, it fits in an uint64 without overflow as we know value is positive.
-		greater = uint64(value) > boundary
+		greater = uint64(value) > uint64(boundary)
 	}
 
 	if greater {
-		return fmt.Errorf("%w: %v is greater than %v", ErrConversionIssue, value, boundary)
+		return Error{
+			value:    value,
+			boundary: boundary,
+			err:      ErrExceedMaximumValue,
+		}
 	}
 
 	return nil
 }
 
-func checkLowerBoundary[T Type](value T, boundary int64) error {
+func checkLowerBoundary[T Type, T2 Type](value T, boundary T2) error {
 	if value >= 0 {
 		return nil
 	}
@@ -55,11 +61,15 @@ func checkLowerBoundary[T Type](value T, boundary int64) error {
 		smaller = float64(f) <= float64(boundary)
 	default:
 		// for all other integer types, it fits in an int64 without overflow as we know value is negative.
-		smaller = int64(value) < boundary
+		smaller = int64(value) < int64(boundary)
 	}
 
 	if smaller {
-		return fmt.Errorf("%w: %v is less than %v", ErrConversionIssue, value, boundary)
+		return Error{
+			value:    value,
+			boundary: boundary,
+			err:      ErrExceedMinimumValue,
+		}
 	}
 
 	return nil
