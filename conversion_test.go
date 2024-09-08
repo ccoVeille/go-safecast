@@ -3,6 +3,7 @@ package safecast_test
 import (
 	"errors"
 	"math"
+	"strings"
 	"testing"
 
 	"github.com/ccoveille/go-safecast"
@@ -26,9 +27,24 @@ func requireError(t *testing.T, err error) {
 	if err == nil {
 		t.Fatal("expected error")
 	}
+}
 
-	if !errors.Is(err, safecast.ErrConversionIssue) {
-		t.Errorf("expected out of range error, got %v", err)
+func requireErrorIs(t *testing.T, err error, expected error) {
+	t.Helper()
+	requireError(t, err)
+
+	if !errors.Is(err, expected) {
+		t.Fatalf("unexpected error got %v, expected %v", err, expected)
+	}
+}
+
+func requireErrorContains(t *testing.T, err error, text string) {
+	t.Helper()
+	requireErrorIs(t, err, safecast.ErrConversionIssue)
+
+	errMessage := err.Error()
+	if !strings.Contains(errMessage, text) {
+		t.Fatalf("error message should contain %q: %q", text, errMessage)
 	}
 }
 
@@ -64,7 +80,7 @@ func assertInt8Error[in safecast.Type](t *testing.T, tests []caseInt8[in]) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := safecast.ToInt8(tt.input)
-			requireError(t, err)
+			requireErrorIs(t, err, safecast.ErrConversionIssue)
 			assertEqual(t, tt.want, got)
 		})
 	}
@@ -205,6 +221,23 @@ func TestToInt8(t *testing.T) {
 	})
 }
 
+func TestErrorMessage(t *testing.T) {
+	_, err := safecast.ToUint8(-1)
+	requireErrorIs(t, err, safecast.ErrConversionIssue)
+	requireErrorIs(t, err, safecast.ErrExceedMinimumValue)
+	requireErrorContains(t, err, "than 0 (uint8)")
+
+	_, err = safecast.ToUint8(math.MaxInt16)
+	requireErrorIs(t, err, safecast.ErrConversionIssue)
+	requireErrorIs(t, err, safecast.ErrExceedMaximumValue)
+	requireErrorContains(t, err, "than 255 (uint8)")
+
+	_, err = safecast.ToInt8(-math.MaxInt16)
+	requireErrorIs(t, err, safecast.ErrConversionIssue)
+	requireErrorIs(t, err, safecast.ErrExceedMinimumValue)
+	requireErrorContains(t, err, "than -128 (int8)")
+}
+
 type caseUint8[in safecast.Type] struct {
 	name  string
 	input in
@@ -231,7 +264,7 @@ func assertUint8Error[in safecast.Type](t *testing.T, tests []caseUint8[in]) {
 			t.Helper()
 
 			got, err := safecast.ToUint8(tt.input)
-			requireError(t, err)
+			requireErrorIs(t, err, safecast.ErrConversionIssue)
 			assertEqual(t, tt.want, got)
 		})
 	}
@@ -397,7 +430,7 @@ func assertInt16Error[in safecast.Type](t *testing.T, tests []caseInt16[in]) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := safecast.ToInt16(tt.input)
-			requireError(t, err)
+			requireErrorIs(t, err, safecast.ErrConversionIssue)
 			assertEqual(t, tt.want, got)
 		})
 	}
@@ -561,7 +594,7 @@ func assertUint16Error[in safecast.Type](t *testing.T, tests []caseUint16[in]) {
 			t.Helper()
 
 			got, err := safecast.ToUint16(tt.input)
-			requireError(t, err)
+			requireErrorIs(t, err, safecast.ErrConversionIssue)
 			assertEqual(t, tt.want, got)
 		})
 	}
@@ -714,7 +747,7 @@ func assertInt32Error[in safecast.Type](t *testing.T, tests []caseInt32[in]) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := safecast.ToInt32(tt.input)
-			requireError(t, err)
+			requireErrorIs(t, err, safecast.ErrConversionIssue)
 			assertEqual(t, tt.want, got)
 		})
 	}
@@ -869,7 +902,7 @@ func assertUint32Error[in safecast.Type](t *testing.T, tests []caseUint32[in]) {
 			t.Helper()
 
 			got, err := safecast.ToUint32(tt.input)
-			requireError(t, err)
+			requireErrorIs(t, err, safecast.ErrConversionIssue)
 			assertEqual(t, tt.want, got)
 		})
 	}
@@ -1026,7 +1059,7 @@ func assertInt64Error[in safecast.Type](t *testing.T, tests []caseInt64[in]) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := safecast.ToInt64(tt.input)
-			requireError(t, err)
+			requireErrorIs(t, err, safecast.ErrConversionIssue)
 			assertEqual(t, tt.want, got)
 		})
 	}
@@ -1167,7 +1200,7 @@ func assertUint64Error[in safecast.Type](t *testing.T, tests []caseUint64[in]) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := safecast.ToUint64(tt.input)
-			requireError(t, err)
+			requireErrorIs(t, err, safecast.ErrConversionIssue)
 			assertEqual(t, tt.want, got)
 		})
 	}
@@ -1318,7 +1351,7 @@ func assertIntError[in safecast.Type](t *testing.T, tests []caseInt[in]) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := safecast.ToInt(tt.input)
-			requireError(t, err)
+			requireErrorIs(t, err, safecast.ErrConversionIssue)
 			assertEqual(t, tt.want, got)
 		})
 	}
@@ -1459,7 +1492,7 @@ func assertUintError[in safecast.Type](t *testing.T, tests []caseUint[in]) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := safecast.ToUint(tt.input)
-			requireError(t, err)
+			requireErrorIs(t, err, safecast.ErrConversionIssue)
 			assertEqual(t, tt.want, got)
 		})
 	}

@@ -11,11 +11,11 @@ import "math"
 // If the conversion results in a value outside the range of an int,
 // an [ErrConversionIssue] error is returned.
 func ToInt[T Type](i T) (int, error) {
-	if err := checkUpperBoundary(i, math.MaxInt); err != nil {
+	if err := checkUpperBoundary(i, int(math.MaxInt)); err != nil {
 		return 0, err
 	}
 
-	if err := checkLowerBoundary(i, math.MinInt); err != nil {
+	if err := checkLowerBoundary(i, int(math.MinInt)); err != nil {
 		return 0, err
 	}
 
@@ -26,11 +26,11 @@ func ToInt[T Type](i T) (int, error) {
 // If the conversion results in a value outside the range of an uint,
 // an [ErrConversionIssue] error is returned.
 func ToUint[T Type](i T) (uint, error) {
-	if err := assertNotNegative(i); err != nil {
+	if err := assertNotNegative(i, uint(0)); err != nil {
 		return 0, err
 	}
 
-	if err := checkUpperBoundary(i, math.MaxUint64); err != nil {
+	if err := checkUpperBoundary(i, uint(math.MaxUint)); err != nil {
 		return 0, err
 	}
 
@@ -41,11 +41,11 @@ func ToUint[T Type](i T) (uint, error) {
 // If the conversion results in a value outside the range of an int8,
 // an [ErrConversionIssue] error is returned.
 func ToInt8[T Type](i T) (int8, error) {
-	if err := checkUpperBoundary(i, math.MaxInt8); err != nil {
+	if err := checkUpperBoundary(i, int8(math.MaxInt8)); err != nil {
 		return 0, err
 	}
 
-	if err := checkLowerBoundary(i, math.MinInt8); err != nil {
+	if err := checkLowerBoundary(i, int8(math.MinInt8)); err != nil {
 		return 0, err
 	}
 
@@ -56,11 +56,11 @@ func ToInt8[T Type](i T) (int8, error) {
 // If the conversion results in a value outside the range of an uint8,
 // an [ErrConversionIssue] error is returned.
 func ToUint8[T Type](i T) (uint8, error) {
-	if err := assertNotNegative(i); err != nil {
+	if err := assertNotNegative(i, uint8(0)); err != nil {
 		return 0, err
 	}
 
-	if err := checkUpperBoundary(i, math.MaxUint8); err != nil {
+	if err := checkUpperBoundary(i, uint8(math.MaxUint8)); err != nil {
 		return 0, err
 	}
 
@@ -71,11 +71,11 @@ func ToUint8[T Type](i T) (uint8, error) {
 // If the conversion results in a value outside the range of an int16,
 // an [ErrConversionIssue] error is returned.
 func ToInt16[T Type](i T) (int16, error) {
-	if err := checkUpperBoundary(i, math.MaxInt16); err != nil {
+	if err := checkUpperBoundary(i, int16(math.MaxInt16)); err != nil {
 		return 0, err
 	}
 
-	if err := checkLowerBoundary(i, math.MinInt16); err != nil {
+	if err := checkLowerBoundary(i, int16(math.MinInt16)); err != nil {
 		return 0, err
 	}
 
@@ -86,11 +86,11 @@ func ToInt16[T Type](i T) (int16, error) {
 // If the conversion results in a value outside the range of an uint16,
 // an [ErrConversionIssue] error is returned.
 func ToUint16[T Type](i T) (uint16, error) {
-	if err := assertNotNegative(i); err != nil {
+	if err := assertNotNegative(i, uint16(0)); err != nil {
 		return 0, err
 	}
 
-	if err := checkUpperBoundary(i, math.MaxUint16); err != nil {
+	if err := checkUpperBoundary(i, uint16(math.MaxUint16)); err != nil {
 		return 0, err
 	}
 
@@ -101,11 +101,11 @@ func ToUint16[T Type](i T) (uint16, error) {
 // If the conversion results in a value outside the range of an int32,
 // an [ErrConversionIssue] error is returned.
 func ToInt32[T Type](i T) (int32, error) {
-	if err := checkUpperBoundary(i, math.MaxInt32); err != nil {
+	if err := checkUpperBoundary(i, int32(math.MaxInt32)); err != nil {
 		return 0, err
 	}
 
-	if err := checkLowerBoundary(i, math.MinInt32); err != nil {
+	if err := checkLowerBoundary(i, int32(math.MinInt32)); err != nil {
 		return 0, err
 	}
 
@@ -116,11 +116,11 @@ func ToInt32[T Type](i T) (int32, error) {
 // If the conversion results in a value outside the range of an uint32,
 // an [ErrConversionIssue] error is returned.
 func ToUint32[T Type](i T) (uint32, error) {
-	if err := assertNotNegative(i); err != nil {
+	if err := assertNotNegative(i, uint32(0)); err != nil {
 		return 0, err
 	}
 
-	if err := checkUpperBoundary(i, math.MaxUint32); err != nil {
+	if err := checkUpperBoundary(i, uint32(math.MaxUint32)); err != nil {
 		return 0, err
 	}
 
@@ -131,7 +131,7 @@ func ToUint32[T Type](i T) (uint32, error) {
 // If the conversion results in a value outside the range of an int64,
 // an [ErrConversionIssue] error is returned.
 func ToInt64[T Type](i T) (int64, error) {
-	if err := checkUpperBoundary(i, math.MaxInt64); err != nil {
+	if err := checkUpperBoundary(i, int64(math.MaxInt64)); err != nil {
 		return 0, err
 	}
 
@@ -142,7 +142,7 @@ func ToInt64[T Type](i T) (int64, error) {
 // If the conversion results in a value outside the range of an uint64,
 // an [ErrConversionIssue] error is returned.
 func ToUint64[T Type](i T) (uint64, error) {
-	if err := assertNotNegative(i); err != nil {
+	if err := assertNotNegative(i, uint64(0)); err != nil {
 		return 0, err
 	}
 
