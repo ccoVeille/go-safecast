@@ -1,69 +1,76 @@
-# Go SafeCast
+# 🪄 go-safecast: safe numbers conversion
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/ccoveille/go-safecast)](https://goreportcard.com/report/github.com/ccoveille/go-safecast)
 [![GoDoc](https://godoc.org/github.com/ccoVeille/go-safecast?status.svg)](https://godoc.org/github.com/ccoVeille/go-safecast)
 [![codecov](https://codecov.io/gh/ccoVeille/go-safecast/graph/badge.svg?token=VW0VO503U6)](https://codecov.io/gh/ccoVeille/go-safecast)
 [![Code Climate](https://codeclimate.com/github/ccoVeille/go-safecast.png)](https://codeclimate.com/github/ccoVeille/go-safecast)
 
-## Origin of this project
+## Project purpose
 
-In Go, integer type conversion can lead to unexpected behavior and errors if not handled carefully.
+In Go, integer type conversion can lead to a silent and unexpected behavior and errors if not handled carefully.
+
+This package is made to help to convert any number to another, and report an error when if there would be a [loss or overflow in the conversion](#conversion-overflows)
+
+## Usage
+
+```go
+package main
+
+import (
+  "fmt"
+
+  "github.com/ccoveille/go-safecast"
+)
+
+func main() {
+  _, err := safecast.ToInt8(uint16(1000))
+  fmt.Println(err) // integer overflow: 1000 (uint16) is greater than 127 (int8): exceed upper boundary for this type
+
+  _, err = safecast.ToUint16(int64(-1))
+  fmt.Println(err) // integer overflow: -1 (int64) is smaller than 0 (uint16): exceed lower boundary for this type
+}
+```
+
+[Go Playground](https://go.dev/play/p/ciic-m0cdfb)
+
+## Conversion overflows
 
 Issues can happen when converting between signed and unsigned integers, or when converting to a smaller integer type.
 
+```go
+package main
+
+import "fmt"
+
+func main() {
+  var a int64
+  a = 42
+  b := uint8(a)
+  fmt.Println(b) // 42
+
+  a = 255 // this is the math.MaxUint8
+  b = uint8(a)
+  fmt.Println(b) // 255
+
+  a = 255 + 1
+  b = uint8(a)
+  fmt.Println(b) // 0 integer overflow
+
+  a = -1
+  b = uint8(a)
+  fmt.Println(b) // 255 integer overflow
+}
+```
+
+[Go Playground](https://go.dev/play/p/DHfNUcZBvVn)
+
+## Motivation
+
 The gosec project raised this to my attention when the gosec [G115 rule was added](https://github.com/securego/gosec/pull/1149)
 
-> G115: Potential integer overflow when converting between integer types
+> G115: Potential integer overflow when converting between integer types.
 
 This issue was way more complex than expected, and required multiple fixes.
-
-## Example
-
-This code seems OK
-
-```go
-package main
-
-import (
-  "fmt"
-)
-
-func main() {
-  var a uint64
-  a = 42
-  b := int32(a)
-  fmt.Println(b) // 42
-}
-```
-
-But the conversion to int32 will behave differently depending on the value
-
-```go
-package main
-
-import (
-  "fmt"
-)
-
-func main() {
-  var a uint64
-  a = 2147483647
-  b := int32(a)
-  fmt.Println(b) // 2147483647
-
-  a = 2147483647 + 1
-  b = int32(a)
-  fmt.Println(b) // -2147483648 integer overflow
-
-  c := -1
-  d := uint32(c)
-  fmt.Println(d) // 4294967295
-}
-```
-
-GoPlay: [https://go.dev/play/p/9PRWI7e0x1T](https://go.dev/play/p/9PRWI7e0x1T)
-
-### What is the problem ?
 
 [CWE-190](https://cwe.mitre.org/data/definitions/190.html) explains in detail.
 
@@ -73,8 +80,6 @@ But to sum it up, you can face:
 - access to wrong resource by id
 - grant access to someone who exhausted their quota
 
-## Motivation
-
 The gosec G115 will now report issues in a lot of project.
 
 ## Alternatives
@@ -82,7 +87,7 @@ The gosec G115 will now report issues in a lot of project.
 Some libraries existed, but they were not able to cover all the use cases.
 
 - [github.com/rung/go-safecast](https://github.com/rung/go-safecast):
-  Unmaintained, not architecture agnostic, do not support uint -> int conversion
+  Unmaintained, not architecture agnostic, do not support `uint` -> `int` conversion
 
 - [github.com/cybergarage/go-safecast](https://github.com/cybergarage/go-safecast)
-  Work with pointer like json.Marshall
+  Work with pointer like `json.Marshall`
