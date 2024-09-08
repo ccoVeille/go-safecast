@@ -5,27 +5,9 @@
 package safecast
 
 import (
-	"errors"
 	"fmt"
 	"math"
 )
-
-// Integer is an alias for the int, uint, int8, uint8, int16, uint16, int32, uint32, int64, and uint64 types.
-type Integer interface {
-	~int | ~uint | ~int8 | ~uint8 | ~int16 | ~uint16 | ~int32 | ~uint32 | ~int64 | ~uint64
-}
-
-// Float is an alias for the float32 and float64 types.
-type Float interface {
-	~float32 | ~float64
-}
-
-// Number is an alias for the int, uint, int8, uint8, int16, uint16, int32, uint32, int64, uint64, float32, and float64 types.
-type Number interface {
-	Integer | Float
-}
-
-var ErrOutOfRange = errors.New("out of range")
 
 // ToInt attempts to convert any [Number] value to an int.
 // If the conversion results in a value outside the range of an int,
@@ -167,11 +149,4 @@ func ToUint64[T Number](i T) (uint64, error) {
 	}
 
 	return uint64(i), nil
-}
-
-func assertNotNegative[T Number](i T) error {
-	if i < 0 {
-		return fmt.Errorf("%w: %v is negative", ErrOutOfRange, i)
-	}
-	return nil
 }
