@@ -40,13 +40,13 @@ func assertNoError(t *testing.T, err error) {
 	}
 }
 
-type caseInt8[in safecast.Number] struct {
+type caseInt8[in safecast.Type] struct {
 	name  string
 	input in
 	want  int8
 }
 
-func assertInt8OK[in safecast.Number](t *testing.T, tests []caseInt8[in]) {
+func assertInt8OK[in safecast.Type](t *testing.T, tests []caseInt8[in]) {
 	t.Helper()
 
 	for _, tt := range tests {
@@ -58,7 +58,7 @@ func assertInt8OK[in safecast.Number](t *testing.T, tests []caseInt8[in]) {
 	}
 }
 
-func assertInt8Error[in safecast.Number](t *testing.T, tests []caseInt8[in]) {
+func assertInt8Error[in safecast.Type](t *testing.T, tests []caseInt8[in]) {
 	t.Helper()
 
 	for _, tt := range tests {
@@ -205,13 +205,13 @@ func TestToInt8(t *testing.T) {
 	})
 }
 
-type caseUint8[in safecast.Number] struct {
+type caseUint8[in safecast.Type] struct {
 	name  string
 	input in
 	want  uint8
 }
 
-func assertUint8OK[in safecast.Number](t *testing.T, tests []caseUint8[in]) {
+func assertUint8OK[in safecast.Type](t *testing.T, tests []caseUint8[in]) {
 	t.Helper()
 
 	for _, tt := range tests {
@@ -223,7 +223,7 @@ func assertUint8OK[in safecast.Number](t *testing.T, tests []caseUint8[in]) {
 	}
 }
 
-func assertUint8Error[in safecast.Number](t *testing.T, tests []caseUint8[in]) {
+func assertUint8Error[in safecast.Type](t *testing.T, tests []caseUint8[in]) {
 	t.Helper()
 
 	for _, tt := range tests {
@@ -373,13 +373,13 @@ func TestToUint8(t *testing.T) {
 	})
 }
 
-type caseInt16[in safecast.Number] struct {
+type caseInt16[in safecast.Type] struct {
 	name  string
 	input in
 	want  int16
 }
 
-func assertInt16OK[in safecast.Number](t *testing.T, tests []caseInt16[in]) {
+func assertInt16OK[in safecast.Type](t *testing.T, tests []caseInt16[in]) {
 	t.Helper()
 
 	for _, tt := range tests {
@@ -391,7 +391,7 @@ func assertInt16OK[in safecast.Number](t *testing.T, tests []caseInt16[in]) {
 	}
 }
 
-func assertInt16Error[in safecast.Number](t *testing.T, tests []caseInt16[in]) {
+func assertInt16Error[in safecast.Type](t *testing.T, tests []caseInt16[in]) {
 	t.Helper()
 
 	for _, tt := range tests {
@@ -535,13 +535,13 @@ func TestToInt16(t *testing.T) {
 	})
 }
 
-type caseUint16[in safecast.Number] struct {
+type caseUint16[in safecast.Type] struct {
 	name  string
 	input in
 	want  uint16
 }
 
-func assertUint16OK[in safecast.Number](t *testing.T, tests []caseUint16[in]) {
+func assertUint16OK[in safecast.Type](t *testing.T, tests []caseUint16[in]) {
 	t.Helper()
 
 	for _, tt := range tests {
@@ -553,7 +553,7 @@ func assertUint16OK[in safecast.Number](t *testing.T, tests []caseUint16[in]) {
 	}
 }
 
-func assertUint16Error[in safecast.Number](t *testing.T, tests []caseUint16[in]) {
+func assertUint16Error[in safecast.Type](t *testing.T, tests []caseUint16[in]) {
 	t.Helper()
 
 	for _, tt := range tests {
@@ -690,13 +690,13 @@ func TestToUint16(t *testing.T) {
 	})
 }
 
-type caseInt32[in safecast.Number] struct {
+type caseInt32[in safecast.Type] struct {
 	name  string
 	input in
 	want  int32
 }
 
-func assertInt32OK[in safecast.Number](t *testing.T, tests []caseInt32[in]) {
+func assertInt32OK[in safecast.Type](t *testing.T, tests []caseInt32[in]) {
 	t.Helper()
 
 	for _, tt := range tests {
@@ -708,7 +708,7 @@ func assertInt32OK[in safecast.Number](t *testing.T, tests []caseInt32[in]) {
 	}
 }
 
-func assertInt32Error[in safecast.Number](t *testing.T, tests []caseInt32[in]) {
+func assertInt32Error[in safecast.Type](t *testing.T, tests []caseInt32[in]) {
 	t.Helper()
 
 	for _, tt := range tests {
@@ -843,13 +843,13 @@ func TestToInt32(t *testing.T) {
 	})
 }
 
-type caseUint32[in safecast.Number] struct {
+type caseUint32[in safecast.Type] struct {
 	name  string
 	input in
 	want  uint32
 }
 
-func assertUint32OK[in safecast.Number](t *testing.T, tests []caseUint32[in]) {
+func assertUint32OK[in safecast.Type](t *testing.T, tests []caseUint32[in]) {
 	t.Helper()
 
 	for _, tt := range tests {
@@ -861,7 +861,7 @@ func assertUint32OK[in safecast.Number](t *testing.T, tests []caseUint32[in]) {
 	}
 }
 
-func assertUint32Error[in safecast.Number](t *testing.T, tests []caseUint32[in]) {
+func assertUint32Error[in safecast.Type](t *testing.T, tests []caseUint32[in]) {
 	t.Helper()
 
 	for _, tt := range tests {
@@ -1002,13 +1002,13 @@ func TestToUint32(t *testing.T) {
 	})
 }
 
-type caseInt64[in safecast.Number] struct {
+type caseInt64[in safecast.Type] struct {
 	name  string
 	input in
 	want  int64
 }
 
-func assertInt64OK[in safecast.Number](t *testing.T, tests []caseInt64[in]) {
+func assertInt64OK[in safecast.Type](t *testing.T, tests []caseInt64[in]) {
 	t.Helper()
 
 	for _, tt := range tests {
@@ -1020,7 +1020,7 @@ func assertInt64OK[in safecast.Number](t *testing.T, tests []caseInt64[in]) {
 	}
 }
 
-func assertInt64Error[in safecast.Number](t *testing.T, tests []caseInt64[in]) {
+func assertInt64Error[in safecast.Type](t *testing.T, tests []caseInt64[in]) {
 	t.Helper()
 
 	for _, tt := range tests {
@@ -1143,13 +1143,13 @@ func TestToInt64(t *testing.T) {
 	})
 }
 
-type caseUint64[in safecast.Number] struct {
+type caseUint64[in safecast.Type] struct {
 	name  string
 	input in
 	want  uint64
 }
 
-func assertUint64OK[in safecast.Number](t *testing.T, tests []caseUint64[in]) {
+func assertUint64OK[in safecast.Type](t *testing.T, tests []caseUint64[in]) {
 	t.Helper()
 
 	for _, tt := range tests {
@@ -1161,7 +1161,7 @@ func assertUint64OK[in safecast.Number](t *testing.T, tests []caseUint64[in]) {
 	}
 }
 
-func assertUint64Error[in safecast.Number](t *testing.T, tests []caseUint64[in]) {
+func assertUint64Error[in safecast.Type](t *testing.T, tests []caseUint64[in]) {
 	t.Helper()
 
 	for _, tt := range tests {
@@ -1290,13 +1290,13 @@ func TestToUint64(t *testing.T) {
 	})
 }
 
-type caseInt[in safecast.Number] struct {
+type caseInt[in safecast.Type] struct {
 	name  string
 	input in
 	want  int
 }
 
-func assertIntOK[in safecast.Number](t *testing.T, tests []caseInt[in]) {
+func assertIntOK[in safecast.Type](t *testing.T, tests []caseInt[in]) {
 	t.Helper()
 
 	for _, tt := range tests {
@@ -1308,7 +1308,7 @@ func assertIntOK[in safecast.Number](t *testing.T, tests []caseInt[in]) {
 	}
 }
 
-func assertIntError[in safecast.Number](t *testing.T, tests []caseInt[in]) {
+func assertIntError[in safecast.Type](t *testing.T, tests []caseInt[in]) {
 	t.Helper()
 
 	for _, tt := range tests {
@@ -1429,13 +1429,13 @@ func TestToInt(t *testing.T) {
 	})
 }
 
-type caseUint[in safecast.Number] struct {
+type caseUint[in safecast.Type] struct {
 	name  string
 	input in
 	want  uint
 }
 
-func assertUintOK[in safecast.Number](t *testing.T, tests []caseUint[in]) {
+func assertUintOK[in safecast.Type](t *testing.T, tests []caseUint[in]) {
 	t.Helper()
 
 	for _, tt := range tests {
@@ -1447,7 +1447,7 @@ func assertUintOK[in safecast.Number](t *testing.T, tests []caseUint[in]) {
 	}
 }
 
-func assertUintError[in safecast.Number](t *testing.T, tests []caseUint[in]) {
+func assertUintError[in safecast.Type](t *testing.T, tests []caseUint[in]) {
 	t.Helper()
 
 	for _, tt := range tests {
