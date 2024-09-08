@@ -9,10 +9,10 @@ import (
 	"math"
 )
 
-// ToInt attempts to convert any [Number] value to an int.
+// ToInt attempts to convert any [Type] value to an int.
 // If the conversion results in a value outside the range of an int,
 // an ErrOutOfRange error is returned.
-func ToInt[T Number](i T) (int, error) {
+func ToInt[T Type](i T) (int, error) {
 	if i > 0 && uint64(i) > math.MaxInt {
 		return 0, fmt.Errorf("%w: %v is greater than math.MaxInt", ErrOutOfRange, i)
 	}
@@ -20,10 +20,10 @@ func ToInt[T Number](i T) (int, error) {
 	return int(i), nil
 }
 
-// ToUint attempts to convert any [Number] value to an uint.
+// ToUint attempts to convert any [Type] value to an uint.
 // If the conversion results in a value outside the range of an uint,
 // an ErrOutOfRange error is returned.
-func ToUint[T Number](i T) (uint, error) {
+func ToUint[T Type](i T) (uint, error) {
 	if err := assertNotNegative(i); err != nil {
 		return 0, err
 	}
@@ -35,10 +35,10 @@ func ToUint[T Number](i T) (uint, error) {
 	return uint(i), nil
 }
 
-// ToInt8 attempts to convert any [Number] value to an int8.
+// ToInt8 attempts to convert any [Type] value to an int8.
 // If the conversion results in a value outside the range of an int8,
 // an ErrOutOfRange error is returned.
-func ToInt8[T Number](i T) (int8, error) {
+func ToInt8[T Type](i T) (int8, error) {
 	if i > math.MaxInt8 {
 		return 0, fmt.Errorf("%w: %v is greater than math.MaxInt8", ErrOutOfRange, i)
 	}
@@ -50,10 +50,10 @@ func ToInt8[T Number](i T) (int8, error) {
 	return int8(i), nil
 }
 
-// ToUint8 attempts to convert any [Number] value to an uint8.
+// ToUint8 attempts to convert any [Type] value to an uint8.
 // If the conversion results in a value outside the range of an uint8,
 // an ErrOutOfRange error is returned.
-func ToUint8[T Number](i T) (uint8, error) {
+func ToUint8[T Type](i T) (uint8, error) {
 	if err := assertNotNegative(i); err != nil {
 		return 0, err
 	}
@@ -65,10 +65,10 @@ func ToUint8[T Number](i T) (uint8, error) {
 	return uint8(i), nil
 }
 
-// ToInt16 attempts to convert any [Number] value to an int16.
+// ToInt16 attempts to convert any [Type] value to an int16.
 // If the conversion results in a value outside the range of an int16,
 // an ErrOutOfRange error is returned.
-func ToInt16[T Number](i T) (int16, error) {
+func ToInt16[T Type](i T) (int16, error) {
 	if i > 0 && uint64(i) > math.MaxInt16 {
 		return 0, fmt.Errorf("%w: %v is greater than math.MaxInt16", ErrOutOfRange, i)
 	}
@@ -80,10 +80,10 @@ func ToInt16[T Number](i T) (int16, error) {
 	return int16(i), nil
 }
 
-// ToUint16 attempts to convert any [Number] value to an uint16.
+// ToUint16 attempts to convert any [Type] value to an uint16.
 // If the conversion results in a value outside the range of an uint16,
 // an ErrOutOfRange error is returned.
-func ToUint16[T Number](i T) (uint16, error) {
+func ToUint16[T Type](i T) (uint16, error) {
 	if err := assertNotNegative(i); err != nil {
 		return 0, err
 	}
@@ -95,10 +95,10 @@ func ToUint16[T Number](i T) (uint16, error) {
 	return uint16(i), nil
 }
 
-// ToInt32 attempts to convert any [Number] value to an int32.
+// ToInt32 attempts to convert any [Type] value to an int32.
 // If the conversion results in a value outside the range of an int32,
 // an ErrOutOfRange error is returned.
-func ToInt32[T Number](i T) (int32, error) {
+func ToInt32[T Type](i T) (int32, error) {
 	if i > 0 && uint64(i) > math.MaxInt32 {
 		return 0, fmt.Errorf("%w: %v is greater than math.MaxInt32", ErrOutOfRange, i)
 	}
@@ -110,10 +110,10 @@ func ToInt32[T Number](i T) (int32, error) {
 	return int32(i), nil
 }
 
-// ToUint32 attempts to convert any [Number] value to an uint32.
+// ToUint32 attempts to convert any [Type] value to an uint32.
 // If the conversion results in a value outside the range of an uint32,
 // an ErrOutOfRange error is returned.
-func ToUint32[T Number](i T) (uint32, error) {
+func ToUint32[T Type](i T) (uint32, error) {
 	if err := assertNotNegative(i); err != nil {
 		return 0, err
 	}
@@ -125,10 +125,10 @@ func ToUint32[T Number](i T) (uint32, error) {
 	return uint32(i), nil
 }
 
-// ToInt64 attempts to convert any [Number] value to an int64.
+// ToInt64 attempts to convert any [Type] value to an int64.
 // If the conversion results in a value outside the range of an int64,
 // an ErrOutOfRange error is returned.
-func ToInt64[T Number](i T) (int64, error) {
+func ToInt64[T Type](i T) (int64, error) {
 	if i > 0 && uint64(i) > math.MaxInt64 {
 		return 0, fmt.Errorf("%w: %v is greater than math.MaxInt64", ErrOutOfRange, i)
 	}
@@ -136,10 +136,10 @@ func ToInt64[T Number](i T) (int64, error) {
 	return int64(i), nil
 }
 
-// ToUint64 attempts to convert any [Number] value to an uint64.
+// ToUint64 attempts to convert any [Type] value to an uint64.
 // If the conversion results in a value outside the range of an uint64,
 // an ErrOutOfRange error is returned.
-func ToUint64[T Number](i T) (uint64, error) {
+func ToUint64[T Type](i T) (uint64, error) {
 	if err := assertNotNegative(i); err != nil {
 		return 0, err
 	}
