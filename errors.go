@@ -2,4 +2,4 @@ package safecast
 
 import "errors"
 
-var ErrOutOfRange = errors.New("out of range")
+var ErrConversionIssue = errors.New("conversion issue")
