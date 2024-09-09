@@ -5,11 +5,11 @@
 [![codecov](https://codecov.io/gh/ccoVeille/go-safecast/graph/badge.svg?token=VW0VO503U6)](https://codecov.io/gh/ccoVeille/go-safecast)
 [![Code Climate](https://codeclimate.com/github/ccoVeille/go-safecast.png)](https://codeclimate.com/github/ccoVeille/go-safecast)
 
-## Project purpose
+go-safecast solves the type conversion issues in Go
 
 In Go, integer type conversion can lead to a silent and unexpected behavior and errors if not handled carefully.
 
-This package is made to help to convert any number to another, and report an error when if there would be a [loss or overflow in the conversion](#conversion-overflows)
+This package helps to convert any number to another, and report an error when if there would be a [loss or overflow in the conversion](#conversion-issues)
 
 ## Usage
 
@@ -24,42 +24,43 @@ import (
 )
 
 func main() {
+  var a int
 
-  // when there is no overflow
-  //
-  fmt.Println(safecast.ToInt8(float64(42)))
-  // Output: 42, nil
-  fmt.Println(safecast.ToInt8(int64(-1)))
-  // Output: -1, nil
+  a = 42
+  b, err := safecast.ToUint8(a) // everything is fine
+  if err != nil {
+    fmt.Println(err)
+  }
+  fmt.Println(b)
+  // Output: 42
 
-  // when there is an overflow
-  //
-  fmt.Println(safecast.ToInt8(float64(20000)))
-  // Output: 0 conversion issue: 20000 is greater than 127
-  fmt.Println(safecast.ToUint8(int64(-1)))
-  // Output: 0 conversion issue: -1 is negative
-  fmt.Println(safecast.ToInt16(int32(40000)))
-  // Output: 0 conversion issue: 40000 is greater than 32767
-  fmt.Println(safecast.ToUint16(int64(-1)))
-  // Output: 0 conversion issue: -1 is negative
-  fmt.Println(safecast.ToInt32(math.MaxUint32 + 1))
-  // Output: 0 conversion issue: 4294967296 is greater than 2147483647
-  fmt.Println(safecast.ToUint32(int64(-1)))
-  // Output: 0 conversion issue: -1 is negative
-  fmt.Println(safecast.ToInt64(uint64(math.MaxInt64) + 1))
-  // Output: 0 conversion issue: 9223372036854775808 is greater than 9223372036854775807
-  fmt.Println(safecast.ToUint64(int8(-1)))
-  // Output: 0 conversion issue: -1 is negative
-  fmt.Println(safecast.ToInt(uint64(math.MaxInt) + 1))
-  // Output: 0 conversion issue: 9223372036854775808 is greater than 9223372036854775807
-  fmt.Println(safecast.ToUint(int8(-1)))
-  // Output: 0 conversion issue: -1 is negative
+  a = 255 + 1
+  _, err = safecast.ToUint8(a) // 256 is greater than uint8 maximum value
+  if err != nil {
+    fmt.Println(err)
+    // Output: conversion issue: 256 (int) is greater than 255 (uint8): maximum value for this type exceeded
+  }
+
+  a = -1
+  _, err = safecast.ToUint8(a) // -1 cannot fit in uint8
+  if err != nil {
+    fmt.Println(err)
+    // Output: conversion issue: -1 (int) is less than 0 (uint8): minimum value for this type exceeded
+  }
+
+  str := "\x99" // ASCII code 153 for Trademark symbol
+  e := str[0]
+  _, err = safecast.ToInt8(e)
+  if err != nil {
+    fmt.Println(err)
+    // Output: conversion issue: 153 (uint8) is greater than 127 (int8): maximum value for this type exceeded
+  }
 }
 ```
 
-[Go Playground](https://go.dev/play/p/VCrv1aLJjMQ)
+[Go Playground](https://go.dev/play/p/nelJshulOnj)
 
-## Conversion overflows
+## Conversion issues
 
 Issues can happen when converting between signed and unsigned integers, or when converting to a smaller integer type.
 
@@ -89,6 +90,45 @@ func main() {
 ```
 
 [Go Playground](https://go.dev/play/p/DHfNUcZBvVn)
+
+So you need to adapt your code to write something like this.
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+  var a int64
+  a = 42
+  if a < 0 || a > math.MaxUint8 {
+    log.Println("overflow") // Output: overflow
+  }
+  fmt.Println(b) // 42
+
+  a = 255 // this is the math.MaxUint8
+  b = uint8(a)
+  fmt.Println(b) // 255
+
+  a = 255 + 1
+  b = uint8(a)
+  if a < 0 || a > math.MaxUint8 {
+    log.Println("overflow") // Output: overflow
+  }
+  fmt.Println(b) // Output: 0
+
+  a = -1
+  b = uint8(a)
+  if a < 0 || a > math.MaxUint8 {
+    log.Println("overflow") // Output: overflow
+  }
+  fmt.Println(b) // Output:255
+}
+```
+
+[Go Playground](https://go.dev/play/p/qAHGyy4NCLP)
+
+`go-safecast` is there to avoid boilerplate copy pasta.
 
 ## Motivation
 
