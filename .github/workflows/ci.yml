@@ -1,5 +1,5 @@
 ---
-name: CI
+name: Format & Lint
 on:
   pull_request:
 jobs:
@@ -23,31 +23,3 @@ jobs:
 
       - name: editorconfig-checker-action
         uses: editorconfig-checker/action-editorconfig-checker@v2
-
-  go-lint:
-    runs-on: ubuntu-latest
-    steps:
-      - name: checkout-action
-        uses: actions/checkout@v4.1.7
-
-      - name: Set up Go
-        uses: actions/setup-go@v5
-
-      - name: Run tests
-        run: go test -coverprofile=coverage.txt
-
-      - name: Upload results to Codecov
-        uses: codecov/codecov-action@v4
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-
-      - name: Code Climate Coverage Action
-        uses: paambaati/codeclimate-action@v9
-        env:
-          CC_TEST_REPORTER_ID: ${{ secrets.CODE_CLIMATE_REPORTER_ID }}
-        with:
-          coverageLocations: coverage.txt:gocov
-          prefix: github.com/ccoveille/go-safecast
-
-      - name: Launch golangci-lint
-        uses: golangci/golangci-lint-action@v6.1.0
