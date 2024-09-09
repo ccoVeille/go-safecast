@@ -1,11 +1,12 @@
 ---
-name: Coverage
+name: Test & Coverage
 on:
+  pull_request:
   push:
     branches:
       - main
 jobs:
-  go-lint:
+  go-test-coverage:
     runs-on: ubuntu-latest
     steps:
       - name: checkout-action
@@ -21,6 +22,14 @@ jobs:
         uses: codecov/codecov-action@v4
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Code Climate Coverage Action
+        uses: paambaati/codeclimate-action@v9
+        env:
+          CC_TEST_REPORTER_ID: ${{ secrets.CODE_CLIMATE_REPORTER_ID }}
+        with:
+          coverageLocations: coverage.txt:gocov
+          prefix: github.com/ccoveille/go-safecast
 
       - name: Launch golangci-lint
         uses: golangci/golangci-lint-action@v6.1.0
