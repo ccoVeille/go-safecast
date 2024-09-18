@@ -1163,7 +1163,7 @@ func TestToInt64(t *testing.T) {
 		assertInt64Error(t, []caseInt64[float32]{
 			{name: "out of range math.MaxInt64 + 1", input: math.MaxInt64 + 1},
 			{name: "out of range math.MaxUint64", input: math.MaxUint64},
-			{name: "out of range math.MinInt64", input: math.MinInt64},
+			{name: "out of range math.MinInt64", input: math.MinInt64 * 1.02}, // because of float imprecision, we have to exceed the min int64 to trigger the error
 			{name: "out of range math.MaxFloat32", input: math.MaxFloat32},
 			{name: "out of range -math.MaxFloat32", input: -math.MaxFloat32},
 		})
@@ -1183,7 +1183,7 @@ func TestToInt64(t *testing.T) {
 		assertInt64Error(t, []caseInt64[float64]{
 			{name: "out of range math.MaxInt64 + 1", input: math.MaxInt64 + 1},
 			{name: "out of range math.MaxUint64", input: math.MaxUint64},
-			{name: "out of range math.MinInt64", input: math.MinInt64},
+			{name: "out of range math.MinInt64", input: math.MinInt64 * 1.02}, // because of float imprecision, we have to exceed the min int64 to trigger the error
 			{name: "out of range math.MaxFloat32", input: math.MaxFloat32},
 			{name: "out of range -math.MaxFloat32", input: -math.MaxFloat32},
 			{name: "out of range math.MaxFloat64", input: math.MaxFloat64},
@@ -1466,7 +1466,7 @@ func TestToInt(t *testing.T) {
 		assertIntError(t, []caseInt[float32]{
 			{name: "out of range math.MaxInt64 + 1", input: math.MaxInt64 + 1},
 			{name: "out of range math.MaxUint64", input: math.MaxUint64},
-			{name: "out of range math.MinInt64", input: math.MinInt64},
+			{name: "out of range math.MinInt64", input: math.MinInt64 * 1.02}, // because of float imprecision, we have to exceed the min int64 to trigger the error
 			{name: "out of range math.MaxFloat32", input: math.MaxFloat32},
 			{name: "out of range -math.MaxFloat32", input: -math.MaxFloat32},
 		})
@@ -1477,12 +1477,13 @@ func TestToInt(t *testing.T) {
 			{name: "zero", input: 0.0, want: 0},
 			{name: "rounded value", input: 1.1, want: 1},
 			{name: "positive within range", input: 10000.9, want: 10000},
+			{name: "math.MinInt64", input: math.MinInt64, want: math.MinInt64}, // pass because of float imprecision
 		})
 
 		assertIntError(t, []caseInt[float64]{
 			{name: "out of range math.MaxInt64 + 1", input: math.MaxInt64 + 1},
 			{name: "out of range math.MaxUint64", input: math.MaxUint64},
-			{name: "out of range math.MinInt64", input: math.MinInt64},
+			{name: "out of range math.MinInt64", input: math.MinInt64 * 1.02}, // because of float imprecision, we have to exceed the min int64 to trigger the error
 			{name: "out of range math.MaxFloat32", input: math.MaxFloat32},
 			{name: "out of range -math.MaxFloat32", input: -math.MaxFloat32},
 			{name: "out of range math.MaxFloat64", input: math.MaxFloat64},
