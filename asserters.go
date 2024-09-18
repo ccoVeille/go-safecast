@@ -1,16 +1,5 @@
 package safecast
 
-func assertNotNegative[T Type, T2 Type](i T, zero T2) error {
-	if i < 0 {
-		return Error{
-			err:      ErrExceedMinimumValue,
-			value:    i,
-			boundary: zero,
-		}
-	}
-	return nil
-}
-
 func checkUpperBoundary[T Type, T2 Type](value T, boundary T2) error {
 	if value <= 0 {
 		return nil
