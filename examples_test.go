@@ -186,3 +186,21 @@ func ExampleToUint() {
 	// 42
 	// conversion issue: -1 (int8) is less than 0 (uint): minimum value for this type exceeded
 }
+
+func ExampleConvert() {
+	a := int(42)
+	i, err := safecast.Convert[int32](a)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(i)
+
+	a = int(math.MaxUint32 + 1)
+	_, err = safecast.ToInt32(a)
+	if err != nil {
+		fmt.Println(err)
+	}
+	// Output:
+	// 42
+	// conversion issue: 4294967296 (int) is greater than 2147483647 (int32): maximum value for this type exceeded
+}
