@@ -131,6 +131,10 @@ func ToUint32[T Type](i T) (uint32, error) {
 // If the conversion results in a value outside the range of an int64,
 // an [ErrConversionIssue] error is returned.
 func ToInt64[T Type](i T) (int64, error) {
+	if err := checkLowerBoundary(i, int64(math.MinInt64)); err != nil {
+		return 0, err
+	}
+
 	if err := checkUpperBoundary(i, int64(math.MaxInt64)); err != nil {
 		return 0, err
 	}
