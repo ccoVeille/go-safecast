@@ -1,6 +1,6 @@
 package safecast
 
-// This files is highly inspired from https://pkg.go.dev/golang.org/x/exp/constraints
+// These files are highly inspired from https://pkg.go.dev/golang.org/x/exp/constraints
 // I didn't import it as it would have added an unnecessary dependency
 
 // Signed is an alias for all signed integers: int, int8, int16, int32, and int64 types.
