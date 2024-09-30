@@ -7,6 +7,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout-action
-        uses: actions/checkout@v4.1.7
+        uses: actions/checkout@v4.2.0
       - name: actionlint
         uses: raven-actions/actionlint@v2.0.0

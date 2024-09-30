@@ -10,7 +10,7 @@ jobs:
       fail-fast: false
     steps:
       - name: checkout-action
-        uses: actions/checkout@v4.1.7
+        uses: actions/checkout@v4.2.0
 
       - name: yamllint
         uses: ibiqlik/action-yamllint@v3
