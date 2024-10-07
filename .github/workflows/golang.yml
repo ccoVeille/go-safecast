@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout-action
-        uses: actions/checkout@v4.1.7
+        uses: actions/checkout@v4.2.0
 
       - name: Set up Go
         uses: actions/setup-go@v5
@@ -32,4 +32,4 @@ jobs:
           prefix: github.com/ccoveille/go-safecast
 
       - name: Launch golangci-lint
-        uses: golangci/golangci-lint-action@v6.1.0
+        uses: golangci/golangci-lint-action@v6.1.1

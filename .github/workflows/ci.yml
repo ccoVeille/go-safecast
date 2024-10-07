@@ -10,13 +10,13 @@ jobs:
       fail-fast: false
     steps:
       - name: checkout-action
-        uses: actions/checkout@v4.1.7
+        uses: actions/checkout@v4.2.0
 
       - name: yamllint
         uses: ibiqlik/action-yamllint@v3
 
       - name: typos-action
-        uses: crate-ci/typos@v1.24.6
+        uses: crate-ci/typos@v1.25.0
 
       - name: markdownlint-cli2-action
         uses: DavidAnson/markdownlint-cli2-action@v17.0.0
