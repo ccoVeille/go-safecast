@@ -4,6 +4,7 @@
 [![GoDoc](https://godoc.org/github.com/ccoVeille/go-safecast?status.svg)](https://godoc.org/github.com/ccoVeille/go-safecast)
 [![codecov](https://codecov.io/gh/ccoVeille/go-safecast/graph/badge.svg?token=VW0VO503U6)](https://codecov.io/gh/ccoVeille/go-safecast)
 [![Code Climate](https://codeclimate.com/github/ccoVeille/go-safecast.png)](https://codeclimate.com/github/ccoVeille/go-safecast)
+[![Sourcegraph](https://sourcegraph.com/github.com/ccoveille/go-safecast/-/badge.svg)](https://sourcegraph.com/github.com/ccoveille/go-safecast?badge)
 
 go-safecast solves the type conversion issues in Go
 
