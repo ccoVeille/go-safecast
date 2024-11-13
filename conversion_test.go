@@ -1,90 +1,16 @@
 package safecast_test
 
+// The tests in conversion_test.go are the ones that are not architecture dependent
+// The tests in conversion_64bit_test.go complete them for 64-bit systems
+//
+// The architecture dependent file covers the fact, you can reach a higher value with int and uint
+// on 64-bit systems, but you will get a compile error on 32-bit.
+// This is why it needs to be tested in an architecture dependent way.
+
 import (
-	"errors"
 	"math"
-	"strings"
 	"testing"
-
-	"github.com/ccoveille/go-safecast"
 )
-
-func assertEqual[V comparable](t *testing.T, expected, got V) {
-	t.Helper()
-
-	if expected == got {
-		return
-	}
-
-	t.Errorf("Not equal: \n"+
-		"expected: %v (%T)\n"+
-		"actual  : %v (%T)", expected, expected, got, got)
-}
-
-func requireError(t *testing.T, err error) {
-	t.Helper()
-
-	if err == nil {
-		t.Fatal("expected error")
-	}
-}
-
-func requireErrorIs(t *testing.T, err error, expected error) {
-	t.Helper()
-	requireError(t, err)
-
-	if !errors.Is(err, expected) {
-		t.Fatalf("unexpected error got %v, expected %v", err, expected)
-	}
-}
-
-func requireErrorContains(t *testing.T, err error, text string) {
-	t.Helper()
-	requireErrorIs(t, err, safecast.ErrConversionIssue)
-
-	errMessage := err.Error()
-	if !strings.Contains(errMessage, text) {
-		t.Fatalf("error message should contain %q: %q", text, errMessage)
-	}
-}
-
-func assertNoError(t *testing.T, err error) {
-	t.Helper()
-
-	if err != nil {
-		t.Errorf("expected no error, got %v", err)
-	}
-}
-
-type caseInt8[in safecast.Type] struct {
-	name  string
-	input in
-	want  int8
-}
-
-func assertInt8OK[in safecast.Type](t *testing.T, tests []caseInt8[in]) {
-	t.Helper()
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := safecast.ToInt8(tt.input)
-			assertNoError(t, err)
-			assertEqual(t, tt.want, got)
-		})
-	}
-}
-
-func assertInt8Error[in safecast.Type](t *testing.T, tests []caseInt8[in]) {
-	t.Helper()
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := safecast.ToInt8(tt.input)
-			requireErrorIs(t, err, safecast.ErrConversionIssue)
-			assertEqual(t, tt.want, got)
-		})
-	}
-}
 
 func TestToInt8(t *testing.T) {
 	t.Run("from int", func(t *testing.T) {
@@ -219,55 +145,6 @@ func TestToInt8(t *testing.T) {
 			{name: "positive out of range", input: math.MaxInt8 + 1},
 		})
 	})
-}
-
-func TestErrorMessage(t *testing.T) {
-	_, err := safecast.ToUint8(-1)
-	requireErrorIs(t, err, safecast.ErrConversionIssue)
-	requireErrorIs(t, err, safecast.ErrExceedMinimumValue)
-	requireErrorContains(t, err, "than 0 (uint8)")
-
-	_, err = safecast.ToUint8(math.MaxInt16)
-	requireErrorIs(t, err, safecast.ErrConversionIssue)
-	requireErrorIs(t, err, safecast.ErrExceedMaximumValue)
-	requireErrorContains(t, err, "than 255 (uint8)")
-
-	_, err = safecast.ToInt8(-math.MaxInt16)
-	requireErrorIs(t, err, safecast.ErrConversionIssue)
-	requireErrorIs(t, err, safecast.ErrExceedMinimumValue)
-	requireErrorContains(t, err, "than -128 (int8)")
-}
-
-type caseUint8[in safecast.Type] struct {
-	name  string
-	input in
-	want  uint8
-}
-
-func assertUint8OK[in safecast.Type](t *testing.T, tests []caseUint8[in]) {
-	t.Helper()
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := safecast.ToUint8(tt.input)
-			assertNoError(t, err)
-			assertEqual(t, tt.want, got)
-		})
-	}
-}
-
-func assertUint8Error[in safecast.Type](t *testing.T, tests []caseUint8[in]) {
-	t.Helper()
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			t.Helper()
-
-			got, err := safecast.ToUint8(tt.input)
-			requireErrorIs(t, err, safecast.ErrConversionIssue)
-			assertEqual(t, tt.want, got)
-		})
-	}
 }
 
 func TestToUint8(t *testing.T) {
@@ -406,36 +283,6 @@ func TestToUint8(t *testing.T) {
 	})
 }
 
-type caseInt16[in safecast.Type] struct {
-	name  string
-	input in
-	want  int16
-}
-
-func assertInt16OK[in safecast.Type](t *testing.T, tests []caseInt16[in]) {
-	t.Helper()
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := safecast.ToInt16(tt.input)
-			assertNoError(t, err)
-			assertEqual(t, tt.want, got)
-		})
-	}
-}
-
-func assertInt16Error[in safecast.Type](t *testing.T, tests []caseInt16[in]) {
-	t.Helper()
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := safecast.ToInt16(tt.input)
-			requireErrorIs(t, err, safecast.ErrConversionIssue)
-			assertEqual(t, tt.want, got)
-		})
-	}
-}
-
 func TestToInt16(t *testing.T) {
 	t.Run("from int", func(t *testing.T) {
 		assertInt16OK(t, []caseInt16[int]{
@@ -568,38 +415,6 @@ func TestToInt16(t *testing.T) {
 	})
 }
 
-type caseUint16[in safecast.Type] struct {
-	name  string
-	input in
-	want  uint16
-}
-
-func assertUint16OK[in safecast.Type](t *testing.T, tests []caseUint16[in]) {
-	t.Helper()
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := safecast.ToUint16(tt.input)
-			assertNoError(t, err)
-			assertEqual(t, tt.want, got)
-		})
-	}
-}
-
-func assertUint16Error[in safecast.Type](t *testing.T, tests []caseUint16[in]) {
-	t.Helper()
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			t.Helper()
-
-			got, err := safecast.ToUint16(tt.input)
-			requireErrorIs(t, err, safecast.ErrConversionIssue)
-			assertEqual(t, tt.want, got)
-		})
-	}
-}
-
 func TestToUint16(t *testing.T) {
 	t.Run("from int", func(t *testing.T) {
 		assertUint16OK(t, []caseUint16[int]{
@@ -723,36 +538,6 @@ func TestToUint16(t *testing.T) {
 	})
 }
 
-type caseInt32[in safecast.Type] struct {
-	name  string
-	input in
-	want  int32
-}
-
-func assertInt32OK[in safecast.Type](t *testing.T, tests []caseInt32[in]) {
-	t.Helper()
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := safecast.ToInt32(tt.input)
-			assertNoError(t, err)
-			assertEqual(t, tt.want, got)
-		})
-	}
-}
-
-func assertInt32Error[in safecast.Type](t *testing.T, tests []caseInt32[in]) {
-	t.Helper()
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := safecast.ToInt32(tt.input)
-			requireErrorIs(t, err, safecast.ErrConversionIssue)
-			assertEqual(t, tt.want, got)
-		})
-	}
-}
-
 func TestToInt32(t *testing.T) {
 	t.Run("from int", func(t *testing.T) {
 		assertInt32OK(t, []caseInt32[int]{
@@ -761,10 +546,8 @@ func TestToInt32(t *testing.T) {
 			{name: "negative within range", input: -10000, want: -10000},
 		})
 
-		assertInt32Error(t, []caseInt32[int]{
-			{name: "positive out of range", input: math.MaxInt32 + 1},
-			{name: "negative out of range", input: math.MinInt32 - 1},
-		})
+		// There are extra checks in [TestToInt32_64bit]
+		// the tests are separated because they cannot work on i386
 	})
 
 	t.Run("from int8", func(t *testing.T) {
@@ -876,38 +659,6 @@ func TestToInt32(t *testing.T) {
 	})
 }
 
-type caseUint32[in safecast.Type] struct {
-	name  string
-	input in
-	want  uint32
-}
-
-func assertUint32OK[in safecast.Type](t *testing.T, tests []caseUint32[in]) {
-	t.Helper()
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := safecast.ToUint32(tt.input)
-			assertNoError(t, err)
-			assertEqual(t, tt.want, got)
-		})
-	}
-}
-
-func assertUint32Error[in safecast.Type](t *testing.T, tests []caseUint32[in]) {
-	t.Helper()
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			t.Helper()
-
-			got, err := safecast.ToUint32(tt.input)
-			requireErrorIs(t, err, safecast.ErrConversionIssue)
-			assertEqual(t, tt.want, got)
-		})
-	}
-}
-
 func TestToUint32(t *testing.T) {
 	t.Run("from int", func(t *testing.T) {
 		assertUint32OK(t, []caseUint32[int]{
@@ -916,7 +667,8 @@ func TestToUint32(t *testing.T) {
 		})
 
 		assertUint32Error(t, []caseUint32[int]{
-			{name: "positive out of range", input: math.MaxUint32 + 1},
+			// There are extra checks in [TestToUint32_64bit]
+			// the tests are separated because they cannot work on i386
 			{name: "negative value", input: -1},
 		})
 	})
@@ -972,9 +724,8 @@ func TestToUint32(t *testing.T) {
 			{name: "positive within range", input: 100, want: 100},
 		})
 
-		assertUint32Error(t, []caseUint32[uint]{
-			{name: "positive out of range", input: math.MaxUint32 + 1},
-		})
+		// There are extra checks in [TestToUint32_64bit]
+		// the tests are separated because they cannot work on i386
 	})
 
 	t.Run("from uint8", func(t *testing.T) {
@@ -1035,36 +786,6 @@ func TestToUint32(t *testing.T) {
 	})
 }
 
-type caseInt64[in safecast.Type] struct {
-	name  string
-	input in
-	want  int64
-}
-
-func assertInt64OK[in safecast.Type](t *testing.T, tests []caseInt64[in]) {
-	t.Helper()
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := safecast.ToInt64(tt.input)
-			assertNoError(t, err)
-			assertEqual(t, tt.want, got)
-		})
-	}
-}
-
-func assertInt64Error[in safecast.Type](t *testing.T, tests []caseInt64[in]) {
-	t.Helper()
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := safecast.ToInt64(tt.input)
-			requireErrorIs(t, err, safecast.ErrConversionIssue)
-			assertEqual(t, tt.want, got)
-		})
-	}
-}
-
 func TestToInt64(t *testing.T) {
 	t.Run("from int", func(t *testing.T) {
 		assertInt64OK(t, []caseInt64[int]{
@@ -1112,9 +833,8 @@ func TestToInt64(t *testing.T) {
 			{name: "positive within range", input: 100, want: 100},
 		})
 
-		assertInt64Error(t, []caseInt64[uint]{
-			{name: "positive out of range", input: math.MaxInt64 + 1},
-		})
+		// There are extra checks in [TestToInt64_64bit]
+		// the tests are separated because they cannot work on i386
 	})
 
 	t.Run("from uint8", func(t *testing.T) {
@@ -1190,36 +910,6 @@ func TestToInt64(t *testing.T) {
 			{name: "out of range -math.MaxFloat64", input: -math.MaxFloat64},
 		})
 	})
-}
-
-type caseUint64[in safecast.Type] struct {
-	name  string
-	input in
-	want  uint64
-}
-
-func assertUint64OK[in safecast.Type](t *testing.T, tests []caseUint64[in]) {
-	t.Helper()
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := safecast.ToUint64(tt.input)
-			assertNoError(t, err)
-			assertEqual(t, tt.want, got)
-		})
-	}
-}
-
-func assertUint64Error[in safecast.Type](t *testing.T, tests []caseUint64[in]) {
-	t.Helper()
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := safecast.ToUint64(tt.input)
-			requireErrorIs(t, err, safecast.ErrConversionIssue)
-			assertEqual(t, tt.want, got)
-		})
-	}
 }
 
 func TestToUint64(t *testing.T) {
@@ -1342,36 +1032,6 @@ func TestToUint64(t *testing.T) {
 	})
 }
 
-type caseInt[in safecast.Type] struct {
-	name  string
-	input in
-	want  int
-}
-
-func assertIntOK[in safecast.Type](t *testing.T, tests []caseInt[in]) {
-	t.Helper()
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := safecast.ToInt(tt.input)
-			assertNoError(t, err)
-			assertEqual(t, tt.want, got)
-		})
-	}
-}
-
-func assertIntError[in safecast.Type](t *testing.T, tests []caseInt[in]) {
-	t.Helper()
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := safecast.ToInt(tt.input)
-			requireErrorIs(t, err, safecast.ErrConversionIssue)
-			assertEqual(t, tt.want, got)
-		})
-	}
-}
-
 func TestToInt(t *testing.T) {
 	t.Run("from int", func(t *testing.T) {
 		assertIntOK(t, []caseInt[int]{
@@ -1419,9 +1079,8 @@ func TestToInt(t *testing.T) {
 			{name: "positive within range", input: 100, want: 100},
 		})
 
-		assertIntError(t, []caseInt[uint]{
-			{name: "positive out of range", input: math.MaxInt64 + 1},
-		})
+		// There are extra checks in [TestToInt_64bit]
+		// the tests are separated because they cannot work on i386
 	})
 
 	t.Run("from uint8", func(t *testing.T) {
@@ -1477,7 +1136,8 @@ func TestToInt(t *testing.T) {
 			{name: "zero", input: 0.0, want: 0},
 			{name: "rounded value", input: 1.1, want: 1},
 			{name: "positive within range", input: 10000.9, want: 10000},
-			{name: "math.MinInt64", input: math.MinInt64, want: math.MinInt64}, // pass because of float imprecision
+			// There are extra checks in [TestToInt_64bit]
+			// the tests are separated because they cannot work on i386
 		})
 
 		assertIntError(t, []caseInt[float64]{
@@ -1490,36 +1150,6 @@ func TestToInt(t *testing.T) {
 			{name: "out of range -math.MaxFloat64", input: -math.MaxFloat64},
 		})
 	})
-}
-
-type caseUint[in safecast.Type] struct {
-	name  string
-	input in
-	want  uint
-}
-
-func assertUintOK[in safecast.Type](t *testing.T, tests []caseUint[in]) {
-	t.Helper()
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := safecast.ToUint(tt.input)
-			assertNoError(t, err)
-			assertEqual(t, tt.want, got)
-		})
-	}
-}
-
-func assertUintError[in safecast.Type](t *testing.T, tests []caseUint[in]) {
-	t.Helper()
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := safecast.ToUint(tt.input)
-			requireErrorIs(t, err, safecast.ErrConversionIssue)
-			assertEqual(t, tt.want, got)
-		})
-	}
 }
 
 func TestToUint(t *testing.T) {
