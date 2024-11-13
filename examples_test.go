@@ -7,6 +7,17 @@ import (
 	"github.com/ccoveille/go-safecast"
 )
 
+// The tests in examples_test.go are the ones that are not architecture dependent
+// The tests in examples_32bit_test.go are for 32-bit systems
+// The tests in examples_64bit_test.go are for 64-bit systems
+//
+// The architecture dependent files cover the difference when dealing with [safecast.ToInt]
+// The error message is different on 32-bit and 64-bit systems
+// The max is 9223372036854775807 on 64-bit and 2147483647 on 32-bit
+//
+// The examples could have been skipped for 32-bit systems,
+// but I wanted the Examples to be launched on this architecture.
+
 func ExampleToInt8() {
 	a := float64(42.42)
 	i, err := safecast.ToInt8(a)
@@ -87,14 +98,14 @@ func ExampleToInt32() {
 	}
 	fmt.Println(i)
 
-	a = int(math.MaxUint32 + 1)
-	_, err = safecast.ToInt32(a)
+	b := uint32(math.MaxInt32) + 1
+	_, err = safecast.ToInt32(b)
 	if err != nil {
 		fmt.Println(err)
 	}
 	// Output:
 	// 42
-	// conversion issue: 4294967296 (int) is greater than 2147483647 (int32): maximum value for this type exceeded
+	// conversion issue: 2147483648 (uint32) is greater than 2147483647 (int32): maximum value for this type exceeded
 }
 
 func ExampleToUint32() {
@@ -149,24 +160,6 @@ func ExampleToUint64() {
 	// Output:
 	// 42
 	// conversion issue: -1 (int8) is less than 0 (uint64): minimum value for this type exceeded
-}
-
-func ExampleToInt() {
-	a := uint64(42)
-	i, err := safecast.ToInt(a)
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println(i)
-
-	a = uint64(math.MaxInt64) + 1
-	_, err = safecast.ToInt(a)
-	if err != nil {
-		fmt.Println(err)
-	}
-	// Output:
-	// 42
-	// conversion issue: 9223372036854775808 (uint64) is greater than 9223372036854775807 (int): maximum value for this type exceeded
 }
 
 func ExampleToUint() {
