@@ -642,7 +642,7 @@ func TestToInt32(t *testing.T) {
 		})
 
 		assertInt32Error(t, []caseInt32[float32]{
-			{name: "positive out of range", input: math.MaxInt32 + 1},
+			{name: "positive out of range", input: math.MaxInt32 * 1.02}, // because of float imprecision, we have to exceed the min int64 to trigger the error
 		})
 	})
 
@@ -654,7 +654,7 @@ func TestToInt32(t *testing.T) {
 		})
 
 		assertInt32Error(t, []caseInt32[float64]{
-			{name: "positive out of range", input: math.MaxInt32 + 1},
+			{name: "positive out of range", input: math.MaxInt32 * 1.02}, // because of float imprecision, we have to exceed the min int64 to trigger the error
 		})
 	})
 }
@@ -768,7 +768,7 @@ func TestToUint32(t *testing.T) {
 		})
 
 		assertUint32Error(t, []caseUint32[float32]{
-			{name: "positive out of range", input: math.MaxUint32 + 1},
+			{name: "positive out of range", input: math.MaxUint32 * 1.02}, // because of float imprecision, we have to exceed the min int64 to trigger the error
 		})
 	})
 
@@ -780,7 +780,7 @@ func TestToUint32(t *testing.T) {
 		})
 
 		assertUint32Error(t, []caseUint32[float64]{
-			{name: "positive out of range", input: math.MaxUint32 + 1},
+			{name: "positive out of range", input: math.MaxUint32 * 1.02}, // because of float imprecision, we have to exceed the min int64 to trigger the error
 			{name: "negative value", input: -1},
 		})
 	})
@@ -881,7 +881,7 @@ func TestToInt64(t *testing.T) {
 		})
 
 		assertInt64Error(t, []caseInt64[float32]{
-			{name: "out of range math.MaxInt64 + 1", input: math.MaxInt64 + 1},
+			{name: "out of range math.MaxInt64", input: math.MaxInt64 * 1.02}, // because of float imprecision, we have to exceed the min int64 to trigger the error
 			{name: "out of range math.MaxUint64", input: math.MaxUint64},
 			{name: "out of range math.MinInt64", input: math.MinInt64 * 1.02}, // because of float imprecision, we have to exceed the min int64 to trigger the error
 			{name: "out of range math.MaxFloat32", input: math.MaxFloat32},
@@ -901,7 +901,7 @@ func TestToInt64(t *testing.T) {
 		})
 
 		assertInt64Error(t, []caseInt64[float64]{
-			{name: "out of range math.MaxInt64 + 1", input: math.MaxInt64 + 1},
+			{name: "out of range math.MaxInt64 + 1", input: math.MaxInt64 * 1.02}, // because of float imprecision, we have to exceed the min int64 to trigger the error
 			{name: "out of range math.MaxUint64", input: math.MaxUint64},
 			{name: "out of range math.MinInt64", input: math.MinInt64 * 1.02}, // because of float imprecision, we have to exceed the min int64 to trigger the error
 			{name: "out of range math.MaxFloat32", input: math.MaxFloat32},
@@ -1012,7 +1012,7 @@ func TestToUint64(t *testing.T) {
 
 		assertUint64Error(t, []caseUint64[float32]{
 			{name: "negative value", input: -1},
-			{name: "out of range max uint64", input: math.MaxUint64},
+			{name: "out of range max uint64", input: math.MaxUint64 * 1.02}, // because of float imprecision, we have to exceed the min int64 to trigger the error
 		})
 	})
 
@@ -1025,7 +1025,7 @@ func TestToUint64(t *testing.T) {
 
 		assertUint64Error(t, []caseUint64[float64]{
 			{name: "negative value", input: -1},
-			{name: "out of range max uint64", input: math.MaxUint64},
+			{name: "out of range max uint64", input: math.MaxUint64 * 1.02}, // because of float imprecision, we have to exceed the min int64 to trigger the error
 			{name: "out of range max float32", input: math.MaxFloat32},
 			{name: "out of range max float64", input: math.MaxFloat64},
 		})
@@ -1123,7 +1123,7 @@ func TestToInt(t *testing.T) {
 		})
 
 		assertIntError(t, []caseInt[float32]{
-			{name: "out of range math.MaxInt64 + 1", input: math.MaxInt64 + 1},
+			{name: "out of range math.MaxInt64 + 1", input: math.MaxInt64 * 1.02}, // because of float imprecision, we have to exceed the min int64 to trigger the error
 			{name: "out of range math.MaxUint64", input: math.MaxUint64},
 			{name: "out of range math.MinInt64", input: math.MinInt64 * 1.02}, // because of float imprecision, we have to exceed the min int64 to trigger the error
 			{name: "out of range math.MaxFloat32", input: math.MaxFloat32},
@@ -1141,7 +1141,7 @@ func TestToInt(t *testing.T) {
 		})
 
 		assertIntError(t, []caseInt[float64]{
-			{name: "out of range math.MaxInt64 + 1", input: math.MaxInt64 + 1},
+			{name: "out of range math.MaxInt64 + 1", input: math.MaxInt64 * 1.02}, // because of float imprecision, we have to exceed the min int64 to trigger the error
 			{name: "out of range math.MaxUint64", input: math.MaxUint64},
 			{name: "out of range math.MinInt64", input: math.MinInt64 * 1.02}, // because of float imprecision, we have to exceed the min int64 to trigger the error
 			{name: "out of range math.MaxFloat32", input: math.MaxFloat32},
@@ -1252,7 +1252,7 @@ func TestToUint(t *testing.T) {
 
 		assertUint64Error(t, []caseUint64[float32]{
 			{name: "negative value", input: -1},
-			{name: "out of range max uint64", input: math.MaxUint64},
+			{name: "out of range max uint64", input: math.MaxUint64 * 1.02}, // because of float imprecision, we have to exceed the min int64 to trigger the error
 			{name: "out of range max float32", input: math.MaxFloat32},
 		})
 	})
@@ -1266,7 +1266,7 @@ func TestToUint(t *testing.T) {
 
 		assertUintError(t, []caseUint[float64]{
 			{name: "negative value", input: -1},
-			{name: "out of range max uint64", input: math.MaxUint64},
+			{name: "out of range max uint64", input: math.MaxUint64 * 1.02}, // because of float imprecision, we have to exceed the min int64 to trigger the error
 			{name: "out of range max float32", input: math.MaxFloat32},
 			{name: "out of range max float64", input: math.MaxFloat64},
 		})
