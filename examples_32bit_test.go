@@ -23,17 +23,13 @@ import (
 func ExampleToInt() {
 	a := uint64(42)
 	i, err := safecast.ToInt(a)
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println(i)
+	fmt.Println(i, err)
 
 	b := float32(math.MaxFloat32)
-	_, err = safecast.ToInt(b)
-	if err != nil {
-		fmt.Println(err)
-	}
+	i, err = safecast.ToInt(b)
+	fmt.Println(i, err)
+
 	// Output:
-	// 42
-	// conversion issue: 3.4028235e+38 (float32) is greater than 2147483647 (int): maximum value for this type exceeded
+	// 42 <nil>
+	// 0 conversion issue: 3.4028235e+38 (float32) is greater than 2147483647 (int): maximum value for this type exceeded
 }
