@@ -1,6 +1,6 @@
 package safecast
 
-func checkUpperBoundary[T Type, T2 Type](value T, boundary T2) error {
+func checkUpperBoundary[T Number, T2 Number](value T, boundary T2) error {
 	if value <= 0 {
 		return nil
 	}
@@ -29,7 +29,7 @@ func checkUpperBoundary[T Type, T2 Type](value T, boundary T2) error {
 	return nil
 }
 
-func checkLowerBoundary[T Type, T2 Type](value T, boundary T2) error {
+func checkLowerBoundary[T Number, T2 Number](value T, boundary T2) error {
 	if value >= 0 {
 		return nil
 	}
@@ -56,7 +56,7 @@ func checkLowerBoundary[T Type, T2 Type](value T, boundary T2) error {
 	return nil
 }
 
-func isFloatOverflow[T Type, T2 Type](value T, boundary T2) bool {
+func isFloatOverflow[T Number, T2 Number](value T, boundary T2) bool {
 	// boundary is positive when checking for an overflow
 
 	// everything fits in float64 without overflow.
@@ -84,7 +84,7 @@ func isFloatOverflow[T Type, T2 Type](value T, boundary T2) bool {
 	return conv <= b*0.99
 }
 
-func isFloatUnderOverflow[T Type, T2 Type](value T, boundary T2) bool {
+func isFloatUnderOverflow[T Number, T2 Number](value T, boundary T2) bool {
 	// everything fits in float64 without overflow.
 	v := float64(value)
 	b := float64(boundary)

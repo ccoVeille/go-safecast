@@ -29,8 +29,3 @@ type Float interface {
 type Number interface {
 	Integer | Float
 }
-
-// Type is an alias for everything that can be converted
-type Type interface {
-	Number
-}
