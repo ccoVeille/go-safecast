@@ -1,116 +1,67 @@
 package safecast
 
-func checkUpperBoundary[T Number, T2 Number](value T, boundary T2) error {
-	if value <= 0 {
-		return nil
-	}
+import "math"
 
-	var overflow bool
-	switch f := any(value).(type) {
-	case float64:
-		overflow = isFloatOverflow(f, boundary)
-
-	case float32:
-		overflow = isFloatOverflow(f, boundary)
-
-	default:
-		// for all other integer types, it fits in an uint64 without overflow as we know value is positive.
-		overflow = uint64(value) > uint64(boundary)
-	}
-
-	if overflow {
-		return Error{
-			value:    value,
-			boundary: boundary,
-			err:      ErrExceedMaximumValue,
-		}
-	}
-
-	return nil
+func negative[T Number](t T) bool {
+	return t < 0
 }
 
-func checkLowerBoundary[T Number, T2 Number](value T, boundary T2) error {
-	if value >= 0 {
-		return nil
-	}
-
-	var underflow bool
-	switch f := any(value).(type) {
-	case float64:
-		underflow = isFloatUnderOverflow(f, boundary)
-	case float32:
-		underflow = isFloatUnderOverflow(f, boundary)
-	default:
-		// for all other integer types, it fits in an int64 without overflow as we know value is negative.
-		underflow = int64(value) < int64(boundary)
-	}
-
-	if underflow {
-		return Error{
-			value:    value,
-			boundary: boundary,
-			err:      ErrExceedMinimumValue,
-		}
-	}
-
-	return nil
+func sameSign[T1, T2 Number](a T1, b T2) bool {
+	return negative(a) == negative(b)
 }
 
-func isFloatOverflow[T Number, T2 Number](value T, boundary T2) bool {
-	// boundary is positive when checking for an overflow
-
-	// everything fits in float64 without overflow.
-	v := float64(value)
-	b := float64(boundary)
-
-	if v > b*1.01 {
-		// way greater than the maximum value
-		return true
+func getUpperBoundary(value any) any {
+	var upper any = math.Inf(1)
+	switch value.(type) {
+	case int8:
+		upper = int8(math.MaxInt8)
+	case int16:
+		upper = int16(math.MaxInt16)
+	case int32:
+		upper = int32(math.MaxInt32)
+	case int64:
+		upper = int64(math.MaxInt64)
+	case int:
+		upper = int(math.MaxInt)
+	case uint8:
+		upper = uint8(math.MaxUint8)
+	case uint32:
+		upper = uint32(math.MaxUint32)
+	case uint16:
+		upper = uint16(math.MaxUint16)
+	case uint64:
+		upper = uint64(math.MaxUint64)
+	case uint:
+		upper = uint(math.MaxUint)
 	}
 
-	if v < b*0.99 {
-		// we are way below the maximum value
-		return false
-	}
-	// we are close to the maximum value
-
-	// let's try to create the overflow
-	// by converting back and forth with type juggling
-	conv := float64(T(T2(v)))
-
-	// the number was between 0.99 and 1.01 of the maximum value
-	// once converted back and forth, we need to check if the value is in the same range
-	// if not, so it's an overflow
-	return conv <= b*0.99
+	return upper
 }
 
-func isFloatUnderOverflow[T Number, T2 Number](value T, boundary T2) bool {
-	// everything fits in float64 without overflow.
-	v := float64(value)
-	b := float64(boundary)
-
-	if b == 0 {
-		// boundary is 0
-		// we can check easily
-		return value < 0
+func getLowerBoundary(value any) any {
+	var lower any = math.Inf(-1)
+	switch value.(type) {
+	case int64:
+		lower = int64(math.MinInt64)
+	case int32:
+		lower = int32(math.MinInt32)
+	case int16:
+		lower = int16(math.MinInt16)
+	case int8:
+		lower = int8(math.MinInt8)
+	case int:
+		lower = int(math.MinInt)
+	case uint:
+		lower = uint(0)
+	case uint8:
+		lower = uint8(0)
+	case uint16:
+		lower = uint16(0)
+	case uint32:
+		lower = uint32(0)
+	case uint64:
+		lower = uint64(0)
 	}
 
-	if v < b*1.01 { // please note value and boundary are negative here
-		// way below than the minimum value, it would underflow
-		return true
-	}
-
-	if v > b*0.99 { // please note value and boundary are negative here
-		// way greater than the minimum value
-		return false
-	}
-
-	// we are just above to the minimum value
-	// let's try to create the underflow
-	conv := float64(T(T2(v)))
-
-	// the number was between 0.99 and 1.01 of the minimum value
-	// once converted back and forth, we need to check if the value is in the same range
-	// if not, so it's an underflow
-	return conv >= b*0.99
+	return lower
 }
