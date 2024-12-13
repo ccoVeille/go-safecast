@@ -99,6 +99,9 @@ linters-settings:
       # report when replacing `errors.New(fmt.Sprintf())` with `fmt.Errorf()` is possible
       - name: errorf
 
+      # enforces conventions on source file names.
+      - name: filename-format
+
       # incrementing an integer variable by 1 is recommended to be done using the `++` operator
       - name: increment-decrement
 
