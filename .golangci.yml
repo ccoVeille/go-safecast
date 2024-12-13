@@ -21,6 +21,9 @@ linters:
     # Vet examines Go source code and reports suspicious constructs.
     - govet
 
+    # gosec is a security linter for Go code.
+    - gosec
+
     # Detects when assignments to existing variables are not used.
     - ineffassign
 
