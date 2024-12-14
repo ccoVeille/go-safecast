@@ -12,6 +12,8 @@ package safecast_test
 import (
 	"math"
 	"testing"
+
+	"github.com/ccoveille/go-safecast"
 )
 
 func TestToInt32_64bit(t *testing.T) {
@@ -51,5 +53,24 @@ func TestToInt_64bit(t *testing.T) {
 		assertIntOK(t, []caseInt[float64]{
 			{name: "math.MinInt64", input: math.MinInt64, want: math.MinInt64}, // pass because of float imprecision
 		})
+	})
+}
+
+// TestConvert_64bit completes the [TestConvert] tests in conversion_test.go
+// it contains the tests that can only works on 64-bit systems
+func TestConvert_64bit(t *testing.T) {
+	t.Run("to uint32", func(t *testing.T) {
+		for name, tt := range map[string]struct {
+			input any
+			want  uint32
+		}{
+			"positive out of range": {input: uint64(math.MaxUint32 + 1), want: 0},
+		} {
+			t.Run(name, func(t *testing.T) {
+				got, err := safecast.Convert[uint32](tt.input)
+				assertEqual(t, tt.want, got)
+				requireErrorIs(t, err, safecast.ErrConversionIssue)
+			})
+		}
 	})
 }

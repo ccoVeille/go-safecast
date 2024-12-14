@@ -8,9 +8,28 @@ package safecast_test
 // This is why it needs to be tested in an architecture dependent way.
 
 import (
+	"fmt"
 	"math"
 	"testing"
+
+	"github.com/ccoveille/go-safecast"
 )
+
+type anyStringer struct {
+	string
+}
+
+func (anyStringer) String() string {
+	return "42"
+}
+
+type anyError struct {
+	string
+}
+
+func (anyError) Error() string {
+	return "42"
+}
 
 func TestToInt8(t *testing.T) {
 	t.Run("from int", func(t *testing.T) {
@@ -1475,5 +1494,438 @@ func TestToFloat64(t *testing.T) {
 			{name: "negative within range", input: -100.9, want: -100.9},
 			{name: "positive within range", input: 100.0, want: 100.0},
 		})
+	})
+}
+
+func TestConvert(t *testing.T) {
+	negativeZero := math.Copysign(0, -1)
+
+	type helper func(input any) (any, error)
+
+	convertUint := func(input any) (any, error) {
+		return safecast.Convert[uint](input)
+	}
+
+	convertUint8 := func(input any) (any, error) {
+		return safecast.Convert[uint8](input)
+	}
+
+	convertUint16 := func(input any) (any, error) {
+		return safecast.Convert[uint16](input)
+	}
+
+	convertUint32 := func(input any) (any, error) {
+		return safecast.Convert[uint32](input)
+	}
+
+	convertUint64 := func(input any) (any, error) {
+		return safecast.Convert[uint64](input)
+	}
+
+	convertInt := func(input any) (any, error) {
+		return safecast.Convert[int](input)
+	}
+
+	convertInt8 := func(input any) (any, error) {
+		return safecast.Convert[int8](input)
+	}
+
+	convertInt16 := func(input any) (any, error) {
+		return safecast.Convert[int16](input)
+	}
+
+	convertInt32 := func(input any) (any, error) {
+		return safecast.Convert[int32](input)
+	}
+
+	convertInt64 := func(input any) (any, error) {
+		return safecast.Convert[int64](input)
+	}
+
+	convertFloat32 := func(input any) (any, error) {
+		return safecast.Convert[float32](input)
+	}
+
+	convertFloat64 := func(input any) (any, error) {
+		return safecast.Convert[float64](input)
+	}
+
+	unsignedConverters := map[string]helper{
+		"uint":   convertUint,
+		"uint8":  convertUint8,
+		"uint16": convertUint16,
+		"uint32": convertUint32,
+		"uint64": convertUint64,
+	}
+
+	allConverters := map[string]helper{
+		"uint":    convertUint,
+		"uint8":   convertUint8,
+		"uint16":  convertUint16,
+		"uint32":  convertUint32,
+		"uint64":  convertUint64,
+		"int":     convertInt,
+		"int8":    convertInt8,
+		"int16":   convertInt16,
+		"int32":   convertInt32,
+		"int64":   convertInt64,
+		"float32": convertFloat32,
+		"float64": convertFloat64,
+	}
+
+	for name, converter := range allConverters {
+		t.Run(fmt.Sprintf("convert to %s", name), func(t *testing.T) {
+			for name, tt := range map[string]struct {
+				input any
+				want  any
+			}{
+				"untyped int zero": {input: 0, want: 0},
+
+				"positive untyped int within range": {input: 42, want: 42},
+
+				"int zero":                  {input: int(0), want: 0},
+				"positive int within range": {input: int(42), want: 42},
+
+				"int8 zero":                  {input: int8(0), want: 0},
+				"positive int8 within range": {input: int8(42), want: 42},
+
+				"int16 zero":                  {input: int16(0), want: 0},
+				"positive int16 within range": {input: int16(42), want: 42},
+
+				"int32 zero":                  {input: int32(0), want: 0},
+				"positive int32 within range": {input: int32(42), want: 42},
+
+				"int64 zero":                  {input: int64(0), want: 0},
+				"positive int64 within range": {input: int64(42), want: 42},
+
+				"uint zero":         {input: uint(0), want: 0},
+				"uint within range": {input: uint(42), want: 42},
+
+				"uint8 zero":         {input: uint8(0), want: 0},
+				"uint8 within range": {input: uint8(42), want: 42},
+
+				"uint16 zero":         {input: uint16(0), want: 0},
+				"uint16 within range": {input: uint16(42), want: 42},
+
+				"uint32 zero":         {input: uint32(0), want: 0},
+				"uint32 within range": {input: uint32(42), want: 42},
+
+				"uint64 zero":         {input: uint64(0), want: 0},
+				"uint64 within range": {input: uint64(42), want: 42},
+
+				"float32 zero":                  {input: float32(0), want: 0},
+				"positive float32 within range": {input: float32(42.0), want: 42.0},
+
+				"float64 zero":                  {input: float64(0), want: 0},
+				"positive float64 within range": {input: float64(42.0), want: 42.0},
+
+				"string integer":              {input: "42", want: 42},
+				"string with spaces":          {input: "42 ", want: 42},
+				"string float":                {input: "42.0", want: 42},
+				"string true":                 {input: "true", want: 1},
+				"string false":                {input: "false", want: 0},
+				"string 10_0":                 {input: "10_0", want: 100},
+				"string binary":               {input: "0b101010", want: 42},
+				"string short octal notation": {input: "042", want: 34},
+				"string octal":                {input: "0o42", want: 34},
+				"string hexadecimal":          {input: "0x42", want: 66},
+
+				"boolean true":  {input: true, want: 1},
+				"boolean false": {input: false, want: 0},
+
+				"error":    {input: anyError{"42"}, want: 42},
+				"stringer": {input: anyStringer{"42"}, want: 42},
+			} {
+				t.Run(fmt.Sprintf("from %s", name), func(t *testing.T) {
+					got, err := converter(tt.input)
+					assertNoError(t, err)
+
+					if fmt.Sprint(got) != fmt.Sprint(tt.want) {
+						t.Fatalf("unexpected result %+v != %+v", tt.want, got)
+					}
+				})
+			}
+
+			for name, tt := range map[string]struct {
+				input       any
+				errExpected error
+			}{
+				"nil": {
+					input:       nil,
+					errExpected: safecast.ErrUnsupportedConversion,
+				},
+				"unexpected type": {
+					input:       struct{}{},
+					errExpected: safecast.ErrUnsupportedConversion,
+				},
+				"empty string": {
+					input:       "",
+					errExpected: safecast.ErrStringConversion,
+				},
+				"simple space": {
+					input:       " ",
+					errExpected: safecast.ErrStringConversion,
+				},
+				"simple dot": {
+					input:       ".",
+					errExpected: safecast.ErrStringConversion,
+				},
+				"simple dash": {
+					input:       "-",
+					errExpected: safecast.ErrStringConversion,
+				},
+				"invalid string": {
+					input:       "abc",
+					errExpected: safecast.ErrStringConversion,
+				},
+				"invalid string with dot": {
+					input:       "ab.c",
+					errExpected: safecast.ErrStringConversion,
+				},
+				"string with leading +": {
+					input:       "+42",
+					errExpected: safecast.ErrStringConversion,
+				},
+				"invalid string multiple leading dashes": {
+					input:       "--42",
+					errExpected: safecast.ErrStringConversion,
+				},
+				"invalid string with leading dash": {
+					input:       "-abc",
+					errExpected: safecast.ErrStringConversion,
+				},
+				"invalid string with leading dash and dot": {
+					input:       "-ab.c",
+					errExpected: safecast.ErrStringConversion,
+				},
+			} {
+				t.Run(name, func(t *testing.T) {
+					_, err := converter(tt.input)
+					requireErrorIs(t, err, safecast.ErrConversionIssue)
+					requireErrorIs(t, err, tt.errExpected)
+				})
+			}
+		})
+	}
+
+	t.Run("convert to float32 near zero", func(t *testing.T) {
+		for name, tt := range map[string]struct {
+			input any
+			want  float32
+		}{
+			"negative untyped zero":              {input: negativeZero, want: float32(negativeZero)},
+			"smallest positive non-zero float32": {input: math.SmallestNonzeroFloat32, want: 1e-45},
+			"smallest negative non-zero float32": {input: -math.SmallestNonzeroFloat32, want: -1e-45},
+			"smallest positive non-zero float64": {input: math.SmallestNonzeroFloat64, want: 4.9e-324},
+			"smallest negative non-zero float64": {input: -math.SmallestNonzeroFloat64, want: -4.9e-324},
+		} {
+			t.Run(fmt.Sprintf("from %s", name), func(t *testing.T) {
+				got, err := convertFloat32(tt.input)
+				assertNoError(t, err)
+
+				if got != tt.want {
+					t.Fatalf("unexpected result want:%+v got:%+v", tt.want, got)
+				}
+			})
+		}
+	})
+
+	t.Run("convert to float64 near zero", func(t *testing.T) {
+		for name, tt := range map[string]struct {
+			input any
+			want  float64
+		}{
+			"negative untyped zero":              {input: negativeZero, want: negativeZero},
+			"smallest positive non-zero float32": {input: math.SmallestNonzeroFloat32, want: 1.401298464324817e-45},
+			"smallest negative non-zero float32": {input: -math.SmallestNonzeroFloat32, want: -1.401298464324817e-45},
+			"smallest positive non-zero float64": {input: math.SmallestNonzeroFloat64, want: 4.9e-324},
+			"smallest negative non-zero float64": {input: -math.SmallestNonzeroFloat64, want: -4.9e-324},
+		} {
+			t.Run(fmt.Sprintf("from %s", name), func(t *testing.T) {
+				got, err := convertFloat64(tt.input)
+				assertNoError(t, err)
+
+				if got != tt.want {
+					t.Fatalf("unexpected result want:%+v got:%+v", tt.want, got)
+				}
+			})
+		}
+	})
+
+	t.Run("upper bound overflows", func(t *testing.T) {
+		for name, tt := range map[string]struct {
+			converter helper
+			value     any
+		}{
+			"int": {
+				converter: convertInt,
+				value:     uint(math.MaxInt + 1),
+			},
+			"int8": {
+				converter: convertInt8,
+				value:     math.MaxInt8 + 1,
+			},
+			"int16": {
+				converter: convertInt16,
+				value:     math.MaxInt16 + 1,
+			},
+			"int32": {
+				converter: convertInt32,
+				value:     uint(math.MaxInt32 + 1),
+			},
+			"int64": {
+				converter: convertInt64,
+				value:     float64(math.MaxInt64 + 1), // the float64 conversion is used to avoid overflow on 32-bit
+			},
+			"uint": {
+				converter: convertUint,
+				value:     float64(math.MaxUint * 1.01),
+			},
+			"uint8": {
+				converter: convertUint8,
+				value:     math.MaxUint8 + 1,
+			},
+			"uint16": {
+				converter: convertUint16,
+				value:     math.MaxUint16 + 1,
+			},
+			"uint32": {
+				converter: convertUint32,
+				value:     float64(math.MaxUint32 * 1.01), // the float64 conversion is used to avoid overflow on 32-bit
+			},
+			"uint64": {
+				converter: convertUint64,
+				value:     float64(math.MaxUint64 * 1.01),
+			},
+			"float32": {
+				converter: convertFloat32,
+				value:     math.MaxFloat32 * 1.01,
+			},
+			"int string": {
+				converter: convertInt,
+				value:     "9223372036854775808", // math.MaxInt64 + 1
+			},
+			"int8 string": {
+				converter: convertInt8,
+				value:     "129", // math.MaxInt8 + 1
+			},
+			"int16 string": {
+				converter: convertInt16,
+				value:     "32769", // math.MaxInt16 + 1
+			},
+			"int32 string": {
+				converter: convertInt32,
+				value:     "2147483648", // math.MaxInt32 + 1
+			},
+			"int64 string": {
+				converter: convertInt64,
+				value:     "9223372036854775808", // math.MaxInt64 + 1
+			},
+
+			"int64 string overflow": {
+				converter: convertInt64,
+				value:     "123456789012345678901234567890", // more string than math.MaxInt64 represented as string
+			},
+		} {
+			t.Run("for "+name, func(t *testing.T) {
+				_, err := tt.converter(tt.value)
+				requireErrorIs(t, err, safecast.ErrConversionIssue)
+				requireErrorIs(t, err, safecast.ErrExceedMaximumValue)
+			})
+		}
+	})
+
+	t.Run("lower bound overflows", func(t *testing.T) {
+		for name, tt := range map[string]struct {
+			converter helper
+			value     any
+		}{
+			"int": {
+				converter: convertInt,
+				value:     float32(math.MinInt * 1.01),
+			},
+			"int8": {
+				converter: convertInt8,
+				value:     math.MinInt8 - 1,
+			},
+			"int16": {
+				converter: convertInt16,
+				value:     math.MinInt16 - 1,
+			},
+			"int32": {
+				converter: convertInt32,
+				value:     float64(math.MinInt32 - 1), // the float64 conversion is used to avoid overflow on 32-bit
+			},
+			"int64": {
+				converter: convertInt64,
+				value:     float32(math.MinInt64 * 1.01),
+			},
+			"float32": {
+				converter: convertFloat32,
+				value:     -float64(math.MaxFloat32 * 1.01),
+			},
+
+			// Note: float64 cannot overflow
+
+			"int from string": {
+				converter: convertInt,
+				value:     "-9223372036854775809", // math.MinInt64 - 1
+			},
+
+			"int8 from string": {
+				converter: convertInt8,
+				value:     "-129", // math.MinInt8 - 1
+			},
+
+			"int16 from string": {
+				converter: convertInt16,
+				value:     "-32769", // math.MinInt16 - 1
+			},
+
+			"int32 from string": {
+				converter: convertInt32,
+				value:     "-2147483649", // math.MinInt32 - 1
+			},
+
+			"int64 from string": {
+				converter: convertInt64,
+				value:     "-9223372036854775809", // math.MinInt64 - 1
+			},
+
+			"int64 string overflow": {
+				converter: convertInt64,
+				value:     "-123456789012345678901234567890", // more characters than math.MinInt64 represented as string
+			},
+		} {
+			t.Run("for "+name, func(t *testing.T) {
+				_, err := tt.converter(tt.value)
+				requireErrorIs(t, err, safecast.ErrConversionIssue)
+				requireErrorIs(t, err, safecast.ErrExceedMinimumValue)
+			})
+		}
+
+		for name, converter := range unsignedConverters {
+			t.Run(fmt.Sprintf("for %s", name), func(t *testing.T) {
+				for name, input := range map[string]any{
+					"untyped int within range": -42,
+					"int":                      int(-42),
+					"int8":                     int8(-42),
+					"int16":                    int16(-42),
+					"int32":                    int32(-42),
+					"int64":                    int64(-42),
+					"float32":                  float32(-42),
+					"float64":                  float64(-42),
+
+					"negative string":          "-42",
+					"negative string with dot": "-42.0",
+				} {
+					t.Run(fmt.Sprintf("from %s", name), func(t *testing.T) {
+						_, err := converter(input)
+						requireErrorIs(t, err, safecast.ErrConversionIssue)
+						requireErrorIs(t, err, safecast.ErrExceedMinimumValue)
+					})
+				}
+			})
+		}
 	})
 }
