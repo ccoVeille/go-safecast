@@ -378,3 +378,51 @@ func assertUintError[in safecast.Number](t *testing.T, tests []caseUint[in]) {
 		})
 	}
 }
+
+type caseFloat32[in safecast.Number] struct {
+	name  string
+	input in
+	want  float32
+}
+
+func assertFloat32OK[in safecast.Number](t *testing.T, tests []caseFloat32[in]) {
+	t.Helper()
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := safecast.ToFloat32(tt.input)
+			assertNoError(t, err)
+			assertEqual(t, tt.want, got)
+		})
+	}
+}
+
+func assertFloat32Error[in safecast.Number](t *testing.T, tests []caseFloat32[in]) {
+	t.Helper()
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := safecast.ToFloat32(tt.input)
+			requireErrorIs(t, err, safecast.ErrConversionIssue)
+			assertEqual(t, tt.want, got)
+		})
+	}
+}
+
+type caseFloat64[in safecast.Number] struct {
+	name  string
+	input in
+	want  float64
+}
+
+func assertFloat64OK[in safecast.Number](t *testing.T, tests []caseFloat64[in]) {
+	t.Helper()
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := safecast.ToFloat64(tt.input)
+			assertNoError(t, err)
+			assertEqual(t, tt.want, got)
+		})
+	}
+}
