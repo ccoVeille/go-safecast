@@ -33,6 +33,11 @@ func getUpperBoundary(value any) any {
 		upper = uint64(math.MaxUint64)
 	case uint:
 		upper = uint(math.MaxUint)
+
+	// Note: there is no float64 boundary
+	// because float64 cannot overflow
+	case float32:
+		upper = float32(math.MaxFloat32)
 	}
 
 	return upper
@@ -61,6 +66,12 @@ func getLowerBoundary(value any) any {
 		lower = uint32(0)
 	case uint64:
 		lower = uint64(0)
+
+	// Note: there is no float64 boundary
+	// because float64 cannot overflow
+	case float32:
+		lower = float32(-math.MaxFloat32)
+
 	}
 
 	return lower

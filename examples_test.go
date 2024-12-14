@@ -141,3 +141,31 @@ func ExampleToUint() {
 	// 42 <nil>
 	// 0 conversion issue: -1 (int8) is less than 0 (uint): minimum value for this type exceeded
 }
+
+func ExampleToFloat32() {
+	a := int8(42)
+	i, err := safecast.ToFloat32(a)
+	fmt.Println(i, err)
+
+	b := math.MaxFloat64
+	i, err = safecast.ToFloat32(b)
+	fmt.Println(i, err)
+
+	// Output:
+	// 42 <nil>
+	// 0 conversion issue: 1.7976931348623157e+308 (float64) is greater than 3.4028235e+38 (float32): maximum value for this type exceeded
+}
+
+func ExampleToFloat64() {
+	a := int8(42)
+	i, err := safecast.ToFloat64(a)
+	fmt.Println(i, err)
+
+	b := math.MaxFloat64
+	i, err = safecast.ToFloat64(b)
+	fmt.Println(i, err)
+
+	// Output:
+	// 42 <nil>
+	// 1.7976931348623157e+308 <nil>
+}

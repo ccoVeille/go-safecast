@@ -1280,3 +1280,200 @@ func TestToUint(t *testing.T) {
 		})
 	})
 }
+
+func TestToFloat32(t *testing.T) {
+	t.Run("from int", func(t *testing.T) {
+		assertFloat32OK(t, []caseFloat32[int]{
+			{name: "zero", input: 0, want: 0.0},
+			{name: "negative within range", input: -100, want: -100.0},
+			{name: "positive within range", input: 100, want: 100.0},
+		})
+	})
+
+	t.Run("from int8", func(t *testing.T) {
+		assertFloat32OK(t, []caseFloat32[int8]{
+			{name: "zero", input: 0, want: 0.0},
+			{name: "negative within range", input: -100, want: -100.0},
+			{name: "positive within range", input: 100, want: 100.0},
+		})
+	})
+
+	t.Run("from int16", func(t *testing.T) {
+		assertFloat32OK(t, []caseFloat32[int16]{
+			{name: "zero", input: 0, want: 0.0},
+			{name: "negative within range", input: -100, want: -100.0},
+			{name: "positive within range", input: 100, want: 100.0},
+		})
+	})
+
+	t.Run("from int32", func(t *testing.T) {
+		assertFloat32OK(t, []caseFloat32[int32]{
+			{name: "zero", input: 0, want: 0.0},
+			{name: "negative within range", input: -100, want: -100.0},
+			{name: "positive within range", input: 100, want: 100.0},
+		})
+	})
+
+	t.Run("from int64", func(t *testing.T) {
+		assertFloat32OK(t, []caseFloat32[int64]{
+			{name: "zero", input: 0, want: 0.0},
+			{name: "negative within range", input: -100, want: -100.0},
+			{name: "positive within range", input: 100, want: 100.0},
+		})
+	})
+
+	t.Run("from uint", func(t *testing.T) {
+		assertFloat32OK(t, []caseFloat32[uint]{
+			{name: "zero", input: 0, want: 0.0},
+			{name: "positive within range", input: 100, want: 100.0},
+		})
+	})
+
+	t.Run("from uint8", func(t *testing.T) {
+		assertFloat32OK(t, []caseFloat32[uint8]{
+			{name: "zero", input: 0, want: 0.0},
+			{name: "positive within range", input: 100, want: 100.0},
+		})
+	})
+
+	t.Run("from uint16", func(t *testing.T) {
+		assertFloat32OK(t, []caseFloat32[uint16]{
+			{name: "zero", input: 0, want: 0.0},
+			{name: "positive within range", input: 100, want: 100.0},
+		})
+	})
+
+	t.Run("from uint32", func(t *testing.T) {
+		assertFloat32OK(t, []caseFloat32[uint32]{
+			{name: "zero", input: 0, want: 0.0},
+			{name: "positive within range", input: 100, want: 100.0},
+		})
+	})
+
+	t.Run("from uint64", func(t *testing.T) {
+		assertFloat32OK(t, []caseFloat32[uint64]{
+			{name: "zero", input: 0, want: 0.0},
+			{name: "positive within range", input: 100, want: 100.0},
+		})
+	})
+
+	t.Run("from float32", func(t *testing.T) {
+		assertFloat32OK(t, []caseFloat32[float32]{
+			{name: "zero", input: 0.0, want: 0.0},
+			{name: "rounded value", input: 1.1, want: 1.1},
+			{name: "negative within range", input: -100.9, want: -100.9},
+			{name: "positive within range", input: 100.9, want: 100.9},
+		})
+	})
+
+	t.Run("from float64", func(t *testing.T) {
+		assertFloat32OK(t, []caseFloat32[float64]{
+			{name: "zero", input: 0.0, want: 0.0},
+			{name: "negative zero", input: math.Copysign(0, -1), want: -0},
+			{name: "almost zero", input: math.SmallestNonzeroFloat32, want: 1e-45},
+			{name: "almost negative zero", input: -math.SmallestNonzeroFloat32, want: -1e-45},
+			{name: "negative within range", input: -100.9, want: -100.9},
+			{name: "positive within range", input: 100.9, want: 100.9},
+			{name: "with imprecision due to conversion", input: 2.67428e+28, want: 2.67428e+28},
+		})
+
+		assertFloat32Error(t, []caseFloat32[float64]{
+			{name: "out of range max float32", input: math.MaxFloat32 * 1.02},  // because of float imprecision, we have to exceed the min int64 to trigger the error
+			{name: "out of range min float32", input: -math.MaxFloat32 * 1.02}, // because of float imprecision, we have to exceed the min int64 to trigger the error
+		})
+	})
+}
+
+func TestToFloat64(t *testing.T) {
+	t.Run("from int", func(t *testing.T) {
+		assertFloat64OK(t, []caseFloat64[int]{
+			{name: "zero", input: 0, want: 0.0},
+			{name: "negative within range", input: -100, want: -100.0},
+			{name: "positive within range", input: 100, want: 100.0},
+		})
+	})
+
+	t.Run("from int8", func(t *testing.T) {
+		assertFloat64OK(t, []caseFloat64[int8]{
+			{name: "zero", input: 0, want: 0.0},
+			{name: "negative within range", input: -100, want: -100.0},
+			{name: "positive within range", input: 100, want: 100.0},
+		})
+	})
+
+	t.Run("from int16", func(t *testing.T) {
+		assertFloat64OK(t, []caseFloat64[int16]{
+			{name: "zero", input: 0, want: 0.0},
+			{name: "negative within range", input: -100, want: -100.0},
+			{name: "positive within range", input: 100, want: 100.0},
+		})
+	})
+
+	t.Run("from int32", func(t *testing.T) {
+		assertFloat64OK(t, []caseFloat64[int32]{
+			{name: "zero", input: 0, want: 0.0},
+			{name: "negative within range", input: -100, want: -100.0},
+			{name: "positive within range", input: 100, want: 100.0},
+		})
+	})
+
+	t.Run("from int64", func(t *testing.T) {
+		assertFloat64OK(t, []caseFloat64[int64]{
+			{name: "zero", input: 0, want: 0.0},
+			{name: "negative within range", input: -100, want: -100.0},
+			{name: "positive within range", input: 100, want: 100.0},
+		})
+	})
+
+	t.Run("from uint", func(t *testing.T) {
+		assertFloat64OK(t, []caseFloat64[uint]{
+			{name: "zero", input: 0, want: 0.0},
+			{name: "positive within range", input: 100, want: 100.0},
+		})
+	})
+
+	t.Run("from uint8", func(t *testing.T) {
+		assertFloat64OK(t, []caseFloat64[uint8]{
+			{name: "zero", input: 0, want: 0.0},
+			{name: "positive within range", input: 100, want: 100.0},
+		})
+	})
+
+	t.Run("from uint16", func(t *testing.T) {
+		assertFloat64OK(t, []caseFloat64[uint16]{
+			{name: "zero", input: 0, want: 0.0},
+			{name: "positive within range", input: 100, want: 100.0},
+		})
+	})
+
+	t.Run("from uint32", func(t *testing.T) {
+		assertFloat64OK(t, []caseFloat64[uint32]{
+			{name: "zero", input: 0, want: 0.0},
+			{name: "positive within range", input: 100, want: 100.0},
+		})
+	})
+
+	t.Run("from uint64", func(t *testing.T) {
+		assertFloat64OK(t, []caseFloat64[uint64]{
+			{name: "zero", input: 0, want: 0.0},
+			{name: "positive within range", input: 100, want: 100.0},
+		})
+	})
+
+	t.Run("from float32", func(t *testing.T) {
+		assertFloat64OK(t, []caseFloat64[float64]{
+			{name: "zero", input: 0.0, want: 0.0},
+			{name: "rounded value", input: 1.1, want: 1.1},
+			{name: "negative within range", input: -100.9, want: -100.9},
+			{name: "positive within range", input: 100.9, want: 100.9},
+		})
+	})
+
+	t.Run("from float64", func(t *testing.T) {
+		assertFloat64OK(t, []caseFloat64[float64]{
+			{name: "zero", input: 0.0, want: 0.0},
+			{name: "negative within range", input: -100.9, want: -100.9},
+			{name: "positive within range", input: 100.0, want: 100.0},
+		})
+	})
+}

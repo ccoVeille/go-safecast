@@ -12,6 +12,41 @@ import (
 func convertFromNumber[NumOut Number, NumIn Number](orig NumIn) (converted NumOut, err error) {
 	converted = NumOut(orig)
 
+	// floats could be compared directly
+	switch any(converted).(type) {
+	case float64:
+		// float64 cannot overflow, so we don't have to worry about it
+		return converted, nil
+	case float32:
+		origFloat64, isFloat64 := any(orig).(float64)
+		if !isFloat64 {
+			// only float64 can overflow float32
+			// everything else can be safely converted
+			return converted, nil
+		}
+
+		// check boundary
+		if math.Abs(origFloat64) < math.MaxFloat32 {
+			// the value is within float32 range, there is no overflow
+			return converted, nil
+		}
+
+		// TODO: check for numbers close to math.MaxFloat32
+
+		boundary := getUpperBoundary(converted)
+		errBoundary := ErrExceedMaximumValue
+		if negative(orig) {
+			boundary = getLowerBoundary(converted)
+			errBoundary = ErrExceedMinimumValue
+		}
+
+		return 0, Error{
+			value:    orig,
+			err:      errBoundary,
+			boundary: boundary,
+		}
+	}
+
 	errBoundary := ErrExceedMaximumValue
 	boundary := getUpperBoundary(converted)
 	if negative(orig) {
@@ -27,6 +62,9 @@ func convertFromNumber[NumOut Number, NumIn Number](orig NumIn) (converted NumOu
 		}
 	}
 
+	// convert back to the original type
+	cast := NumIn(converted)
+	// and compare
 	base := orig
 	switch f := any(orig).(type) {
 	case float64:
@@ -35,7 +73,8 @@ func convertFromNumber[NumOut Number, NumIn Number](orig NumIn) (converted NumOu
 		base = NumIn(math.Trunc(float64(f)))
 	}
 
-	if NumIn(converted) == base {
+	// exact match
+	if cast == base {
 		return converted, nil
 	}
 
@@ -114,4 +153,18 @@ func ToInt64[T Number](i T) (int64, error) {
 // an [ErrConversionIssue] error is returned.
 func ToUint64[T Number](i T) (uint64, error) {
 	return convertFromNumber[uint64](i)
+}
+
+// ToFloat32 attempts to convert any [Number] value to a float32.
+// If the conversion results in a value outside the range of a float32,
+// an [ErrConversionIssue] error is returned.
+func ToFloat32[T Number](i T) (float32, error) {
+	return convertFromNumber[float32](i)
+}
+
+// ToFloat64 attempts to convert any [Number] value to a float64.
+// If the conversion results in a value outside the range of a float64,
+// an [ErrConversionIssue] error is returned.
+func ToFloat64[T Number](i T) (float64, error) {
+	return convertFromNumber[float64](i)
 }
