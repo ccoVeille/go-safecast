@@ -6,8 +6,65 @@
 package safecast
 
 import (
+	"errors"
+	"fmt"
 	"math"
+	"strconv"
+	"strings"
 )
+
+// Convert attempts to convert any value to the desired type
+//   - If the conversion is possible, the converted value is returned.
+//   - If the conversion results in a value outside the range of the desired type, an [ErrRangeOverflow] error is wrapped in the returned error.
+//   - If the conversion exceeds the maximum value of the desired type, an [ErrExceedMaximumValue] error is wrapped in the returned error.
+//   - If the conversion exceeds the minimum value of the desired type, an [ErrExceedMinimumValue] error is wrapped in the returned error.
+//   - If the conversion is not possible for the desired type, an [ErrUnsupportedConversion] error is wrapped in the returned error.
+//   - If the conversion fails from string, an [ErrStringConversion] error is wrapped in the returned error.
+//   - If the conversion results in an error, an [ErrConversionIssue] error is wrapped in the returned error.
+func Convert[NumOut Number](orig any) (converted NumOut, err error) {
+	switch v := orig.(type) {
+	case int:
+		return convertFromNumber[NumOut](v)
+	case uint:
+		return convertFromNumber[NumOut](v)
+	case int8:
+		return convertFromNumber[NumOut](v)
+	case uint8:
+		return convertFromNumber[NumOut](v)
+	case int16:
+		return convertFromNumber[NumOut](v)
+	case uint16:
+		return convertFromNumber[NumOut](v)
+	case int32:
+		return convertFromNumber[NumOut](v)
+	case uint32:
+		return convertFromNumber[NumOut](v)
+	case int64:
+		return convertFromNumber[NumOut](v)
+	case uint64:
+		return convertFromNumber[NumOut](v)
+	case float32:
+		return convertFromNumber[NumOut](v)
+	case float64:
+		return convertFromNumber[NumOut](v)
+	case bool:
+		o := 0
+		if v {
+			o = 1
+		}
+		return NumOut(o), nil
+	case fmt.Stringer:
+		return convertFromString[NumOut](v.String())
+	case error:
+		return convertFromString[NumOut](v.Error())
+	case string:
+		return convertFromString[NumOut](v)
+	}
+
+	return 0, Error{
+		err: fmt.Errorf("%w from %T", ErrUnsupportedConversion, orig),
+	}
+}
 
 func convertFromNumber[NumOut Number, NumIn Number](orig NumIn) (converted NumOut, err error) {
 	converted = NumOut(orig)
@@ -85,7 +142,65 @@ func convertFromNumber[NumOut Number, NumIn Number](orig NumIn) (converted NumOu
 	}
 }
 
-// ToInt attempts to convert any [Number] value to an int.
+func convertFromString[NumOut Number](s string) (converted NumOut, err error) {
+	s = strings.TrimSpace(s)
+
+	if b, err := strconv.ParseBool(s); err == nil {
+		if b {
+			return NumOut(1), nil
+		}
+		return NumOut(0), nil
+	}
+
+	if strings.Contains(s, ".") {
+		o, err := strconv.ParseFloat(s, 64)
+		if err != nil {
+			return 0, Error{
+				value: s,
+				err:   fmt.Errorf("%w %v to %T", ErrStringConversion, s, converted),
+			}
+		}
+		return convertFromNumber[NumOut](o)
+	}
+
+	if strings.HasPrefix(s, "-") {
+		o, err := strconv.ParseInt(s, 0, 64)
+		if err != nil {
+			if errors.Is(err, strconv.ErrRange) {
+				return 0, Error{
+					value:    s,
+					err:      ErrExceedMinimumValue,
+					boundary: math.MinInt,
+				}
+			}
+			return 0, Error{
+				value: s,
+				err:   fmt.Errorf("%w %v to %T", ErrStringConversion, s, converted),
+			}
+		}
+
+		return convertFromNumber[NumOut](o)
+	}
+
+	o, err := strconv.ParseUint(s, 0, 64)
+	if err != nil {
+		if errors.Is(err, strconv.ErrRange) {
+			return 0, Error{
+				value:    s,
+				err:      ErrExceedMaximumValue,
+				boundary: uint(math.MaxUint),
+			}
+		}
+
+		return 0, Error{
+			value: s,
+			err:   fmt.Errorf("%w %v to %T", ErrStringConversion, s, converted),
+		}
+	}
+	return convertFromNumber[NumOut](o)
+}
+
+// ToInt attempts to convert any [Type] value to an int.
 // If the conversion results in a value outside the range of an int,
 // an [ErrConversionIssue] error is returned.
 func ToInt[T Number](i T) (int, error) {
