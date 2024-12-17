@@ -1,8 +1,3 @@
-// Package go-safecast solves the type conversion issues in Go
-//
-// In Go, integer type conversion can lead to unexpected behavior and errors if not handled carefully.
-// Issues can happen when converting between signed and unsigned integers, or when converting to a smaller integer type.
-
 package safecast
 
 import (
@@ -61,7 +56,7 @@ func Convert[NumOut Number](orig any) (converted NumOut, err error) {
 		return convertFromString[NumOut](v)
 	}
 
-	return 0, Error{
+	return 0, errorHelper{
 		err: fmt.Errorf("%w from %T", ErrUnsupportedConversion, orig),
 	}
 }
@@ -97,7 +92,7 @@ func convertFromNumber[NumOut Number, NumIn Number](orig NumIn) (converted NumOu
 			errBoundary = ErrExceedMinimumValue
 		}
 
-		return 0, Error{
+		return 0, errorHelper{
 			value:    orig,
 			err:      errBoundary,
 			boundary: boundary,
@@ -112,7 +107,7 @@ func convertFromNumber[NumOut Number, NumIn Number](orig NumIn) (converted NumOu
 	}
 
 	if !sameSign(orig, converted) {
-		return 0, Error{
+		return 0, errorHelper{
 			value:    orig,
 			err:      errBoundary,
 			boundary: boundary,
@@ -135,7 +130,7 @@ func convertFromNumber[NumOut Number, NumIn Number](orig NumIn) (converted NumOu
 		return converted, nil
 	}
 
-	return 0, Error{
+	return 0, errorHelper{
 		value:    orig,
 		err:      errBoundary,
 		boundary: boundary,
@@ -155,7 +150,7 @@ func convertFromString[NumOut Number](s string) (converted NumOut, err error) {
 	if strings.Contains(s, ".") {
 		o, err := strconv.ParseFloat(s, 64)
 		if err != nil {
-			return 0, Error{
+			return 0, errorHelper{
 				value: s,
 				err:   fmt.Errorf("%w %v to %T", ErrStringConversion, s, converted),
 			}
@@ -167,13 +162,13 @@ func convertFromString[NumOut Number](s string) (converted NumOut, err error) {
 		o, err := strconv.ParseInt(s, 0, 64)
 		if err != nil {
 			if errors.Is(err, strconv.ErrRange) {
-				return 0, Error{
+				return 0, errorHelper{
 					value:    s,
 					err:      ErrExceedMinimumValue,
 					boundary: math.MinInt,
 				}
 			}
-			return 0, Error{
+			return 0, errorHelper{
 				value: s,
 				err:   fmt.Errorf("%w %v to %T", ErrStringConversion, s, converted),
 			}
@@ -185,14 +180,14 @@ func convertFromString[NumOut Number](s string) (converted NumOut, err error) {
 	o, err := strconv.ParseUint(s, 0, 64)
 	if err != nil {
 		if errors.Is(err, strconv.ErrRange) {
-			return 0, Error{
+			return 0, errorHelper{
 				value:    s,
 				err:      ErrExceedMaximumValue,
 				boundary: uint(math.MaxUint),
 			}
 		}
 
-		return 0, Error{
+		return 0, errorHelper{
 			value: s,
 			err:   fmt.Errorf("%w %v to %T", ErrStringConversion, s, converted),
 		}
