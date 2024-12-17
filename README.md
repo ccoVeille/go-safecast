@@ -4,7 +4,8 @@
 [![GoDoc](https://godoc.org/github.com/ccoVeille/go-safecast?status.svg)](https://godoc.org/github.com/ccoVeille/go-safecast)
 [![codecov](https://codecov.io/gh/ccoVeille/go-safecast/graph/badge.svg?token=VW0VO503U6)](https://codecov.io/gh/ccoVeille/go-safecast)
 [![Code Climate](https://codeclimate.com/github/ccoVeille/go-safecast.png)](https://codeclimate.com/github/ccoVeille/go-safecast)
-[![Sourcegraph](https://sourcegraph.com/github.com/ccoveille/go-safecast/-/badge.svg)](https://sourcegraph.com/github.com/ccoveille/go-safecast?badge)
+[![Go Imports](https://img.shields.io/github/search?query=%22%5C%22github.com%2Fccoveille%2Fgo-safecast%5C%22%22%20language%3Ago%20%20-is%3Afork%20-is%3Aarchived%20&label=Go%20imports)](https://github.com/search?q=%22%5C%22github.com%2Fccoveille%2Fgo-safecast%5C%22%22+language%3Ago++-is%3Afork+-is%3Aarchived+&type=code)
+![GitHub Repo stars](https://img.shields.io/github/stars/ccoveille/go-safecast)
 
 go-safecast solves the type conversion issues in Go
 
@@ -158,3 +159,7 @@ Some libraries existed, but they were not able to cover all the use cases.
 
 - [github.com/cybergarage/go-safecast](https://github.com/cybergarage/go-safecast)
   Work with pointer like `json.Marshall`
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=ccoveille/go-safecast&type=Date)](https://star-history.com/#ccoveille/go-safecast&Date)
