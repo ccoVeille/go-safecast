@@ -61,6 +61,15 @@ func Convert[NumOut Number](orig any) (converted NumOut, err error) {
 	}
 }
 
+// MustConvert calls [Convert] to convert the value to the desired type, and panics if the conversion fails.
+func MustConvert[NumOut Number](orig any) NumOut {
+	converted, err := Convert[NumOut](orig)
+	if err != nil {
+		panic(err)
+	}
+	return converted
+}
+
 func convertFromNumber[NumOut Number, NumIn Number](orig NumIn) (converted NumOut, err error) {
 	converted = NumOut(orig)
 

@@ -8,6 +8,7 @@ package safecast_test
 // This is why it needs to be tested in an architecture dependent way.
 
 import (
+	"errors"
 	"fmt"
 	"math"
 	"testing"
@@ -1925,6 +1926,67 @@ func TestConvert(t *testing.T) {
 						requireErrorIs(t, err, safecast.ErrExceedMinimumValue)
 					})
 				}
+			})
+		}
+	})
+}
+
+func TestMustConvert(t *testing.T) {
+	// [TestConvert] tested all the cases
+	// here we are simply checking that the function panic on errors
+
+	t.Run("panic on error", func(t *testing.T) {
+		for name, input := range map[string]any{
+			"nil":      nil,
+			"negative": -1,
+			"overflow": math.MaxInt,
+			"string":   "cats",
+		} {
+			t.Run(name, func(t *testing.T) {
+				// configure validate there is no panic
+				defer func(t *testing.T) {
+					t.Helper()
+
+					r := recover()
+					if r == nil {
+						t.Fatal("did not panic")
+					}
+
+					err, ok := r.(error)
+					if !ok {
+						t.Fatalf("panic value is not an error: %v", r)
+					}
+
+					if !errors.Is(err, safecast.ErrConversionIssue) {
+						t.Fatalf("panic with unexpected error: %v", err)
+					}
+				}(t)
+
+				safecast.MustConvert[uint8](input)
+			})
+		}
+	})
+
+	t.Run("no panic", func(t *testing.T) {
+		for name, input := range map[string]any{
+			"number": 42,
+			"string": "42",
+			"octal":  "0o52",
+			"float":  42.0,
+		} {
+			t.Run(name, func(t *testing.T) {
+				// configure a helper to validate there is no panic
+				defer func(t *testing.T) {
+					t.Helper()
+
+					err := recover()
+					if err != nil {
+						t.Fatalf("panic with %v", err)
+					}
+				}(t)
+
+				converted := safecast.MustConvert[int](input)
+				assertEqual(t, 42, converted)
 			})
 		}
 	})
