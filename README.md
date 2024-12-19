@@ -160,6 +160,6 @@ Some libraries existed, but they were not able to cover all the use cases.
 - [github.com/cybergarage/go-safecast](https://github.com/cybergarage/go-safecast)
   Work with pointer like `json.Marshall`
 
-## Star History
+## Stargazers over time
 
-[![Star History Chart](https://api.star-history.com/svg?repos=ccoveille/go-safecast&type=Date)](https://star-history.com/#ccoveille/go-safecast&Date)
+[![Stargazers over time](https://starchart.cc/ccoVeille/go-safecast.svg?variant=adaptive)](https://starchart.cc/ccoVeille/go-safecast)
