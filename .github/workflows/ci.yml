@@ -16,7 +16,7 @@ jobs:
         uses: ibiqlik/action-yamllint@v3
 
       - name: typos-action
-        uses: crate-ci/typos@v1.28.3
+        uses: crate-ci/typos@v1.28.4
 
       - name: markdownlint-cli2-action
         uses: DavidAnson/markdownlint-cli2-action@v18.0.0
