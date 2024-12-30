@@ -19,7 +19,7 @@ jobs:
         uses: crate-ci/typos@v1.28.4
 
       - name: markdownlint-cli2-action
-        uses: DavidAnson/markdownlint-cli2-action@v18.0.0
+        uses: DavidAnson/markdownlint-cli2-action@v19.0.0
 
       - name: editorconfig-checker-action
         uses: editorconfig-checker/action-editorconfig-checker@v2
