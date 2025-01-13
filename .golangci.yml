@@ -40,6 +40,9 @@ linters:
     # make sure to use t.Helper() when needed
     - thelper
 
+    # checks if package imports are in a list of acceptable packages.
+    - depguard
+
     # mirror suggests rewrites to avoid unnecessary []byte/string conversion
     - mirror
 
@@ -61,6 +64,22 @@ linters-settings:
       - default
       # linters that related to local tool, so they should be separated
       - localmodule
+
+  depguard:
+    rules:
+      # enforce the library has no dependencies except the standard library
+      code:
+        files:
+          - "!$test"  # depguard alias for all files except the test ones
+        allow:
+          - "$gostd"  # depguard alias for all standard libraries
+      # enforce the test files have no dependencies except the standard library and the library itself
+      test:
+        files:
+          - "$test"  # depguard alias for all the test files
+        allow:
+          - "$gostd"  # depguard alias for all standard libraries
+          - "github.com/ccoveille/go-safecast"
 
   revive:
     rules:
