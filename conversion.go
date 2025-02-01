@@ -16,8 +16,8 @@ import (
 //   - If the conversion is not possible for the desired type, an [ErrUnsupportedConversion] error is wrapped in the returned error.
 //   - If the conversion fails from string, an [ErrStringConversion] error is wrapped in the returned error.
 //   - If the conversion results in an error, an [ErrConversionIssue] error is wrapped in the returned error.
-func Convert[NumOut Number](orig any) (converted NumOut, err error) {
-	switch v := orig.(type) {
+func Convert[NumOut Number, NumIn Input](orig NumIn) (converted NumOut, err error) {
+	switch v := any(orig).(type) {
 	case int:
 		return convertFromNumber[NumOut](v)
 	case uint:
@@ -58,7 +58,7 @@ func Convert[NumOut Number](orig any) (converted NumOut, err error) {
 }
 
 // MustConvert calls [Convert] to convert the value to the desired type, and panics if the conversion fails.
-func MustConvert[NumOut Number](orig any) NumOut {
+func MustConvert[NumOut Number, NumIn Input](orig NumIn) NumOut {
 	converted, err := Convert[NumOut](orig)
 	if err != nil {
 		panic(err)
