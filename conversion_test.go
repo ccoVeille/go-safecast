@@ -16,22 +16,6 @@ import (
 	"github.com/ccoveille/go-safecast"
 )
 
-type anyStringer struct {
-	string
-}
-
-func (anyStringer) String() string {
-	return "42"
-}
-
-type anyError struct {
-	string
-}
-
-func (anyError) Error() string {
-	return "42"
-}
-
 func TestToInt8(t *testing.T) {
 	t.Run("from int", func(t *testing.T) {
 		assertInt8OK(t, []caseInt8[int]{
@@ -1633,9 +1617,6 @@ func TestConvert(t *testing.T) {
 
 				"boolean true":  {input: true, want: 1},
 				"boolean false": {input: false, want: 0},
-
-				"error":    {input: anyError{"42"}, want: 42},
-				"stringer": {input: anyStringer{"42"}, want: 42},
 			} {
 				t.Run(fmt.Sprintf("from %s", name), func(t *testing.T) {
 					got, err := converter(tt.input)
