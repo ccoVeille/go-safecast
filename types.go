@@ -29,3 +29,12 @@ type Float interface {
 type Number interface {
 	Integer | Float
 }
+
+// NumberWithoutAlias is an alias for all integers and floats without allowing type aliasing
+type NumberWithoutAlias interface {
+	int | int8 | int16 | int32 | int64 | uint | uint8 | uint16 | uint32 | uint64 | float32 | float64
+}
+
+type Input interface {
+	NumberWithoutAlias | string | bool
+}
