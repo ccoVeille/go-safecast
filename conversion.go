@@ -48,10 +48,6 @@ func Convert[NumOut Number](orig any) (converted NumOut, err error) {
 			o = 1
 		}
 		return NumOut(o), nil
-	case fmt.Stringer:
-		return convertFromString[NumOut](v.String())
-	case error:
-		return convertFromString[NumOut](v.Error())
 	case string:
 		return convertFromString[NumOut](v)
 	}
