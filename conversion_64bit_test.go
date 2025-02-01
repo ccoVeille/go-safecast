@@ -61,7 +61,7 @@ func TestToInt_64bit(t *testing.T) {
 func TestConvert_64bit(t *testing.T) {
 	t.Run("to uint32", func(t *testing.T) {
 		for name, tt := range map[string]struct {
-			input any
+			input uint64
 			want  uint32
 		}{
 			"positive out of range": {input: uint64(math.MaxUint32 + 1), want: 0},
