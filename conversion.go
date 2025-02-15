@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"reflect"
 	"strconv"
 	"strings"
 )
@@ -17,39 +18,46 @@ import (
 //   - If the conversion fails from string, an [ErrStringConversion] error is wrapped in the returned error.
 //   - If the conversion results in an error, an [ErrConversionIssue] error is wrapped in the returned error.
 func Convert[NumOut Number, NumIn Input](orig NumIn) (converted NumOut, err error) {
-	switch v := any(orig).(type) {
-	case int:
-		return convertFromNumber[NumOut](v)
-	case uint:
-		return convertFromNumber[NumOut](v)
-	case int8:
-		return convertFromNumber[NumOut](v)
-	case uint8:
-		return convertFromNumber[NumOut](v)
-	case int16:
-		return convertFromNumber[NumOut](v)
-	case uint16:
-		return convertFromNumber[NumOut](v)
-	case int32:
-		return convertFromNumber[NumOut](v)
-	case uint32:
-		return convertFromNumber[NumOut](v)
-	case int64:
-		return convertFromNumber[NumOut](v)
-	case uint64:
-		return convertFromNumber[NumOut](v)
-	case float32:
-		return convertFromNumber[NumOut](v)
-	case float64:
-		return convertFromNumber[NumOut](v)
-	case bool:
+	v := reflect.ValueOf(orig)
+	switch v.Kind() {
+	case reflect.Int:
+		return convertFromNumber[NumOut](int(v.Int()))
+	case reflect.Uint:
+		return convertFromNumber[NumOut](uint(v.Uint()))
+	case reflect.Int8:
+		//nolint:gosec // the int8 is confirmed
+		return convertFromNumber[NumOut](int8(v.Int()))
+	case reflect.Uint8:
+		//nolint:gosec // the uint8 is confirmed
+		return convertFromNumber[NumOut](uint8(v.Uint()))
+	case reflect.Int16:
+		//nolint:gosec // the int16 is confirmed
+		return convertFromNumber[NumOut](int16(v.Int()))
+	case reflect.Uint16:
+		//nolint:gosec // the uint16 is confirmed
+		return convertFromNumber[NumOut](uint16(v.Uint()))
+	case reflect.Int32:
+		//nolint:gosec // the int32 is confirmed
+		return convertFromNumber[NumOut](int32(v.Int()))
+	case reflect.Uint32:
+		//nolint:gosec // the uint32 is confirmed
+		return convertFromNumber[NumOut](uint32(v.Uint()))
+	case reflect.Int64:
+		return convertFromNumber[NumOut](int64(v.Int()))
+	case reflect.Uint64:
+		return convertFromNumber[NumOut](uint64(v.Uint()))
+	case reflect.Float32:
+		return convertFromNumber[NumOut](float32(v.Float()))
+	case reflect.Float64:
+		return convertFromNumber[NumOut](float64(v.Float()))
+	case reflect.Bool:
 		o := 0
-		if v {
+		if v.Bool() {
 			o = 1
 		}
 		return NumOut(o), nil
-	case string:
-		return convertFromString[NumOut](v)
+	case reflect.String:
+		return convertFromString[NumOut](v.String())
 	}
 
 	return 0, errorHelper{
