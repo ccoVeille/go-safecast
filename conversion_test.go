@@ -1493,6 +1493,7 @@ type MapTest[TypeInput safecast.Input, TypeOutput safecast.Number] struct {
 	Input          TypeInput
 	ExpectedOutput TypeOutput
 	ExpectedError  error
+	ErrorContains  string
 }
 
 func (mt MapTest[I, O]) TestConvert(t *testing.T) {
@@ -1510,6 +1511,11 @@ func (mt MapTest[I, O]) TestConvert(t *testing.T) {
 	if mt.ExpectedError != nil {
 		requireErrorIs(t, err, safecast.ErrConversionIssue)
 		requireErrorIs(t, err, mt.ExpectedError)
+
+		if mt.ErrorContains != "" {
+			requireErrorContains(t, err, mt.ErrorContains)
+		}
+
 		return
 	}
 
@@ -1924,6 +1930,78 @@ func TestConvert(t *testing.T) {
 			c.TestConvert(t)
 		})
 	}
+
+	t.Run("aliases", func(t *testing.T) {
+		// Type aliases are handled separately
+
+		type (
+			// UintSimpleAlias is an alias
+			UintSimpleAlias = uint
+
+			// UintTypeAlias is a type alias
+			UintTypeAlias uint
+
+			// StringAlias is an alias
+			StringAlias = string
+
+			// StringTypeAlias is a type alias
+			StringTypeAlias string
+
+			// BoolAlias is an alias
+			BoolAlias = bool
+
+			// BoolTypeAlias is a type alias
+			BoolTypeAlias bool
+		)
+
+		for name, c := range map[string]TestableConvert{
+			"integer simple alias": MapTest[UintSimpleAlias, int8]{
+				Input:          UintSimpleAlias(42),
+				ExpectedOutput: int8(42),
+			},
+
+			"integer type alias": MapTest[UintTypeAlias, int8]{
+				Input:          UintTypeAlias(42),
+				ExpectedOutput: int8(42),
+			},
+
+			"string simple alias": MapTest[StringAlias, int8]{
+				Input:          StringAlias("42"),
+				ExpectedOutput: int8(42),
+			},
+
+			"string type alias": MapTest[StringTypeAlias, int8]{
+				Input:          StringTypeAlias("42"),
+				ExpectedOutput: int8(42),
+			},
+
+			"bool simple alias": MapTest[BoolAlias, int8]{
+				Input:          BoolAlias(true),
+				ExpectedOutput: int8(1),
+			},
+
+			"bool type alias": MapTest[BoolTypeAlias, int8]{
+				Input:          BoolTypeAlias(true),
+				ExpectedOutput: int8(1),
+			},
+
+			"simple alias overflows for int8": MapTest[UintSimpleAlias, int8]{
+				Input:         UintSimpleAlias(255),
+				ExpectedError: safecast.ErrExceedMaximumValue,
+				ErrorContains: "255 (uint) is greater than 127 (int8)",
+			},
+
+			"type alias overflows for int8": MapTest[UintTypeAlias, int8]{
+				Input:         UintTypeAlias(255),
+				ExpectedError: safecast.ErrExceedMaximumValue,
+				ErrorContains: "255 (uint) is greater than 127 (int8)",
+			},
+		} {
+			t.Run(name, func(t *testing.T) {
+				c.TestConvert(t)
+			})
+		}
+	})
 }
 
 type MapMustConvertTest[TypeInput safecast.Input, TypeOutput safecast.Number] struct {
