@@ -1,0 +1,56 @@
+---
+name: Files Lint
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read  # for actions/checkout to fetch code
+
+jobs:
+  action-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout-action
+        uses: actions/checkout@v4.2.2
+
+      - name: actionlint
+        uses: raven-actions/actionlint@v2.0.0
+
+  yamllint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout-action
+        uses: actions/checkout@v4.2.2
+
+      - name: yamllint
+        uses: ibiqlik/action-yamllint@v3
+
+  typos:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout-action
+        uses: actions/checkout@v4.2.2
+
+      - name: typos-action
+        uses: crate-ci/typos@v1.30.2
+
+  markdownlint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout-action
+        uses: actions/checkout@v4.2.2
+
+      - name: markdownlint-cli2-action
+        uses: DavidAnson/markdownlint-cli2-action@v19.1.0
+
+  editorconfig:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout-action
+        uses: actions/checkout@v4.2.2
+
+      - name: editorconfig-checker-action
+        uses: editorconfig-checker/action-editorconfig-checker@v2
