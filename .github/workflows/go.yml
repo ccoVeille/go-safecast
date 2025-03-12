@@ -1,0 +1,73 @@
+---
+name: Go
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+jobs:
+  go-test-lint:
+    name: Test & Lint
+    strategy:
+      fail-fast: false # continue to run all jobs even if one fails
+      matrix:
+        include:
+          - {os: ubuntu-latest, GOOS: linux, GOARCH: amd64, go-version: stable}
+          - {os: ubuntu-latest, GOOS: linux, GOARCH: amd64, go-version: oldstable}
+          - {os: ubuntu-latest, GOOS: linux, GOARCH: 386, go-version: stable}
+          - {os: macos-latest, GOOS: darwin, GOARCH: amd64, go-version: stable}
+          - {os: macos-latest, GOOS: darwin, GOARCH: arm64, go-version: stable}
+          - {os: windows-latest, GOOS: windows, GOARCH: amd64, go-version: stable}
+          - {os: windows-latest, GOOS: windows, GOARCH: 386, go-version: stable}
+    permissions:
+      contents: read  # for actions/checkout to fetch code
+      pull-requests: read  # for golangci/golangci-lint-action to fetch pull requests
+    runs-on: ${{ matrix.os }}
+    env:
+      GOARCH: ${{ matrix.GOARCH }}
+      GOOS: ${{ matrix.GOOS }}
+    steps:
+      - name: checkout-action
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ matrix.go-version }}
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: latest
+
+      - name: Run tests
+        run: go test
+
+  go-coverage:
+    name: Code Coverage
+    # This one is limited to one arch as we don't need to report coverage multiple times
+    permissions:
+      contents: read  # for actions/checkout to fetch code
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout-action
+        uses: actions/checkout@v4.2.2
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+
+      - name: Run tests
+        run: go test -coverprofile=coverage.txt
+
+      - name: Upload results to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Code Climate Coverage Action
+        uses: paambaati/codeclimate-action@v9
+        env:
+          CC_TEST_REPORTER_ID: ${{secrets.CC_TEST_REPORTER_ID}}
+        with:
+          coverageLocations: coverage.txt:gocov
+          prefix: github.com/ccoveille/go-safecast
