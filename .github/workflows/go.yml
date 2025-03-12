@@ -9,7 +9,7 @@ jobs:
   go-test-lint:
     name: Test & Lint
     strategy:
-      fail-fast: false # continue to run all jobs even if one fails
+      fail-fast: false  # continue to run all jobs even if one fails
       matrix:
         include:
           - {os: ubuntu-latest, GOOS: linux, GOARCH: amd64, go-version: stable}
