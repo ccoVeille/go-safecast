@@ -15,7 +15,7 @@ var ErrRangeOverflow = errors.New("range overflow")
 // ErrExceedMaximumValue is an error for when the value is greater than the maximum value of the desired type.
 var ErrExceedMaximumValue = errors.New("maximum value for this type exceeded")
 
-// ErrExceedMaximumValue is an error for when the value is less than the minimum value of the desired type.
+// ErrExceedMinimumValue is an error for when the value is less than the minimum value of the desired type.
 var ErrExceedMinimumValue = errors.New("minimum value for this type exceeded")
 
 // ErrUnsupportedConversion is an error for when the conversion is not supported from the provided type.
