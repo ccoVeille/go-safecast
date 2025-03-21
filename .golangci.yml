@@ -4,8 +4,16 @@
 # Author: @ccoVeille
 # License: MIT
 # Variant: 03-safe
-# Version: v1.0.0
 #
+issues:
+  include:
+    # restore some rules ignored by default by golangci-lint
+    - EXC0011  # stylecheck:ST1000|ST1020|ST1021|ST1022 about exported functions, structs, and methods should have comments
+    - EXC0012  # revive:exported about exported functions, structs, and methods should have comment
+    - EXC0013  # revive:exported about package comment should contain the name of the package
+    - EXC0014  # revive:exported about comment should contain the name of the function, type, variable, constant, or method.
+    - EXC0015  # revive:exported about package should have a comment
+
 linters:
   # some linters are enabled by default
   # https://golangci-lint.run/usage/linters/
@@ -29,6 +37,9 @@ linters:
 
     # It's a set of rules from staticcheck. See https://staticcheck.io/
     - staticcheck
+
+    # stylecheck is a linter that applies the official Go style guide.
+    - stylecheck
 
     # Fast, configurable, extensible, flexible, and beautiful linter for Go.
     # Drop-in replacement of golint.
@@ -117,6 +128,9 @@ linters-settings:
 
       # report when replacing `errors.New(fmt.Sprintf())` with `fmt.Errorf()` is possible
       - name: errorf
+
+      # exported functions, structs, and methods should have comments.
+      - name: exported
 
       # enforces conventions on source file names.
       - name: filename-format
