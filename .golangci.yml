@@ -4,33 +4,46 @@
 # Author: @ccoVeille
 # License: MIT
 # Variant: 03-safe
+# Version: v2.0.0
 #
-issues:
-  include:
-    # restore some rules ignored by default by golangci-lint
-    - EXC0011  # stylecheck:ST1000|ST1020|ST1021|ST1022 about exported functions, structs, and methods should have comments
-    - EXC0012  # revive:exported about exported functions, structs, and methods should have comment
-    - EXC0013  # revive:exported about package comment should contain the name of the package
-    - EXC0014  # revive:exported about comment should contain the name of the function, type, variable, constant, or method.
-    - EXC0015  # revive:exported about package should have a comment
+version: "2"
+
+formatters:
+  enable:
+    # format the code
+    - gofmt
+    # format the block of imports
+    - gci
+
+  settings:
+    # format the code with Go standard library
+    gofmt:
+      # simplify the code
+      # https://pkg.go.dev/cmd/gofmt#hdr-The_simplify_command
+      simplify: true
+      rewrite-rules:
+        # replace `interface{}` with `any` in the code on format
+        - pattern: 'interface{}'
+          replacement: 'any'
+
+    # make sure imports are always in a deterministic order
+    # https://github.com/daixiang0/gci/
+    gci:  # define the section orders for imports
+      sections:
+        # Standard section: captures all standard packages.
+        - standard
+        # Default section: catchall that is not standard or custom
+        - default
+        # linters that related to local tool, so they should be separated
+        - localmodule
 
 linters:
-  # some linters are enabled by default
-  # https://golangci-lint.run/usage/linters/
-  #
-  # enable some extra linters
   enable:
     # Errcheck is a program for checking for unchecked errors in Go code.
     - errcheck
 
-    # Linter for Go source code that specializes in simplifying code.
-    - gosimple
-
     # Vet examines Go source code and reports suspicious constructs.
     - govet
-
-    # gosec is a security linter for Go code.
-    - gosec
 
     # Detects when assignments to existing variables are not used.
     - ineffassign
@@ -38,15 +51,12 @@ linters:
     # It's a set of rules from staticcheck. See https://staticcheck.io/
     - staticcheck
 
-    # stylecheck is a linter that applies the official Go style guide.
-    - stylecheck
+    # Checks Go code for unused constants, variables, functions and types.
+    - unused
 
     # Fast, configurable, extensible, flexible, and beautiful linter for Go.
     # Drop-in replacement of golint.
     - revive
-
-    # check imports order and makes it always deterministic.
-    - gci
 
     # make sure to use t.Helper() when needed
     - thelper
@@ -66,113 +76,115 @@ linters:
     # Checks for duplicate words in the source code.
     - dupword
 
-linters-settings:
-  gci:  # define the section orders for imports
-    sections:
-      # Standard section: captures all standard packages.
-      - standard
-      # Default section: catchall that is not standard or custom
-      - default
-      # linters that related to local tool, so they should be separated
-      - localmodule
+    # gosec is a security linter for Go code.
+    - gosec
 
-  depguard:
-    rules:
-      # enforce the library has no dependencies except the standard library
-      code:
-        files:
-          - "!$test"  # depguard alias for all files except the test ones
-        allow:
-          - "$gostd"  # depguard alias for all standard libraries
-      # enforce the test files have no dependencies except the standard library and the library itself
-      test:
-        files:
-          - "$test"  # depguard alias for all the test files
-        allow:
-          - "$gostd"  # depguard alias for all standard libraries
-          - "github.com/ccoveille/go-safecast"
+    # Reports uses of functions with replacement inside the testing package.
+    - usetesting
 
-  revive:
-    rules:
-      # these are the default revive rules
-      # you can remove the whole "rules" node if you want
-      # BUT
-      # ! /!\ they all need to be present when you want to add more rules than the default ones
-      # otherwise, you won't have the default rules, but only the ones you define in the "rules" node
 
-      # Blank import should be only in a main or test package, or have a comment justifying it.
-      - name: blank-imports
+  settings:
 
-      # context.Context() should be the first parameter of a function when provided as argument.
-      - name: context-as-argument
-        arguments:
-          - allowTypesBefore: "*testing.T"
+    depguard:
+      rules:
+        # enforce the library has no dependencies except the standard library
+        code:
+          files:
+            - '!$test'
+          allow:
+            - $gostd
+        # enforce the test files have no dependencies except the standard library and the library itself
+        test:
+          files:
+            - $test
+          allow:
+            - $gostd
+            - github.com/ccoveille/go-safecast
 
-      # Basic types should not be used as a key in `context.WithValue`
-      - name: context-keys-type
+    revive:
+      rules:
+        # Blank import should be only in a main or test package, or have a comment justifying it.
+        - name: blank-imports
 
-      # Importing with `.` makes the programs much harder to understand
-      - name: dot-imports
+        # context.Context() should be the first parameter of a function when provided as argument.
+        - name: context-as-argument
+          arguments:
+            - allowTypesBefore: "*testing.T"
 
-      # Empty blocks make code less readable and could be a symptom of a bug or unfinished refactoring.
-      - name: empty-block
+        # Basic types should not be used as a key in `context.WithValue`
+        - name: context-keys-type
 
-      # for better readability, variables of type `error` must be named with the prefix `err`.
-      - name: error-naming
+        # Importing with `.` makes the programs much harder to understand
+        - name: dot-imports
 
-      # for better readability, the errors should be last in the list of returned values by a function.
-      - name: error-return
+        # Empty blocks make code less readable and could be a symptom of a bug or unfinished refactoring.
+        - name: empty-block
 
-      # for better readability, error messages should not be capitalized or end with punctuation or a newline.
-      - name: error-strings
+        # for better readability, variables of type `error` must be named with the prefix `err`.
+        - name: error-naming
 
-      # report when replacing `errors.New(fmt.Sprintf())` with `fmt.Errorf()` is possible
-      - name: errorf
+        # for better readability, the errors should be last in the list of returned values by a function.
+        - name: error-return
 
-      # exported functions, structs, and methods should have comments.
-      - name: exported
+        # for better readability, error messages should not be capitalized or end with punctuation or a newline.
+        - name: error-strings
 
-      # enforces conventions on source file names.
-      - name: filename-format
+        # report when replacing `errors.New(fmt.Sprintf())` with `fmt.Errorf()` is possible
+        - name: errorf
 
-      # incrementing an integer variable by 1 is recommended to be done using the `++` operator
-      - name: increment-decrement
+        # exported functions, structs, and methods should have comments.
+        - name: exported
+          arguments:
+            # make error messages clearer
+            - "sayRepetitiveInsteadOfStutters"
 
-      # highlights redundant else-blocks that can be eliminated from the code
-      - name: indent-error-flow
+        # enforces conventions on source file names.
+        - name: filename-format
 
-      # This rule suggests a shorter way of writing ranges that do not use the second value.
-      - name: range
+        # incrementing an integer variable by 1 is recommended to be done using the `++` operator
+        - name: increment-decrement
 
-      # receiver names in a method should reflect the struct name (p for Person, for example)
-      - name: receiver-naming
+        # highlights redundant else-blocks that can be eliminated from the code
+        - name: indent-error-flow
 
-      # redefining built in names (true, false, append, make) can lead to bugs very difficult to detect.
-      - name: redefines-builtin-id
+        # This rule suggests a shorter way of writing ranges that do not use the second value.
+        - name: range
 
-      # redundant else-blocks that can be eliminated from the code.
-      - name: superfluous-else
+        # receiver names in a method should reflect the struct name (p for Person, for example)
+        - name: receiver-naming
 
-      # prevent confusing name for variables when using `time` package
-      - name: time-naming
+        # redefining built in names (true, false, append, make) can lead to bugs very difficult to detect.
+        - name: redefines-builtin-id
 
-      # warns when an exported function or method returns a value of an un-exported type.
-      - name: unexported-return
+        # redundant else-blocks that can be eliminated from the code.
+        - name: superfluous-else
 
-      # spots and proposes to remove unreachable code. also helps to spot errors
-      - name: unreachable-code
+        # prevent confusing name for variables when using `time` package
+        - name: time-naming
 
-      # Functions or methods with unused parameters can be a symptom of an unfinished refactoring or a bug.
-      - name: unused-parameter
+        # warns when an exported function or method returns a value of an un-exported type.
+        - name: unexported-return
 
-      # report when a variable declaration can be simplified
-      - name: var-declaration
+        # spots and proposes to remove unreachable code. also helps to spot errors
+        - name: unreachable-code
 
-      # warns when initialism, variable or package naming conventions are not followed.
-      - name: var-naming
+        # Functions or methods with unused parameters can be a symptom of an unfinished refactoring or a bug.
+        - name: unused-parameter
 
-  misspell:
-    # Correct spellings using locale preferences for US or UK.
-    # Setting locale to US will correct the British spelling of 'colour' to 'color'.
-    # Default ("") is to use a neutral variety of English.
-    locale: US
+        # report when a variable declaration can be simplified
+        - name: var-declaration
+
+        # warns when initialism, variable or package naming conventions are not followed.
+        - name: var-naming
+
+    misspell:
+      # Correct spellings using locale preferences for US or UK.
+      # Setting locale to US will correct the British spelling of 'colour' to 'color'.
+      # Default ("") is to use a neutral variety of English.
+      locale: US
+
+output:
+  sort-order:
+    - linter
+    - severity
+    - file # filepath, line, and column.
