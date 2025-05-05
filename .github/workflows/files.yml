@@ -35,7 +35,7 @@ jobs:
         uses: actions/checkout@v4.2.2
 
       - name: typos-action
-        uses: crate-ci/typos@v1.31.1
+        uses: crate-ci/typos@v1.32.0
 
   markdownlint:
     runs-on: ubuntu-latest
