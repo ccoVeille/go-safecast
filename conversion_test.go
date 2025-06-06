@@ -2011,8 +2011,13 @@ type MapMustConvertTest[TypeInput safecast.Input, TypeOutput safecast.Number] st
 }
 
 func (mt MapMustConvertTest[I, O]) TestConvert(t *testing.T) {
+	t.Helper()
+
+	var out O
 	defer func(t *testing.T) {
 		t.Helper()
+
+		assertEqual(t, mt.ExpectedOutput, out)
 
 		r := recover()
 
@@ -2038,8 +2043,7 @@ func (mt MapMustConvertTest[I, O]) TestConvert(t *testing.T) {
 		}
 	}(t)
 
-	out := safecast.MustConvert[O](mt.Input)
-	assertEqual(t, mt.ExpectedOutput, out)
+	out = safecast.MustConvert[O](mt.Input)
 }
 
 func TestMustConvert(t *testing.T) {
