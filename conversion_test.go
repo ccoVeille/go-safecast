@@ -9,6 +9,7 @@ package safecast_test
 
 import (
 	"errors"
+	"fmt"
 	"math"
 	"testing"
 
@@ -2074,4 +2075,130 @@ func TestMustConvert(t *testing.T) {
 			})
 		}
 	})
+}
+
+// mockTestingT is a mock implementation of the safecast.TestingT interface
+// that captures the arguments passed to the Fatal method for testing purposes.
+type mockTestingT struct {
+	failed bool
+}
+
+func (m *mockTestingT) Helper() {}
+
+func (m *mockTestingT) Fatal(_ ...any) {
+	m.failed = true
+}
+
+func (m mockTestingT) Failed() bool {
+	return m.failed
+}
+
+// interfaces validation
+// this leads to a compile-time error if there is a mismatch
+var _ safecast.TestingT = new(testing.T)
+var _ safecast.TestingT = new(testing.B)
+var _ safecast.TestingT = new(testing.F)
+var _ safecast.TestingT = new(mockTestingT)
+
+type MapRequireConvertTest[TypeInput safecast.Input, TypeOutput safecast.Number] struct {
+	Input               TypeInput
+	ExpectedOutput      TypeOutput
+	ExpectedTestFailure bool
+}
+
+func (mt MapRequireConvertTest[I, O]) TestConvert(t *testing.T) {
+	t.Helper()
+
+	// We need to use a fake testing.T to avoid the test failing when we expect a failure
+	fakeT := new(mockTestingT)
+	out := safecast.RequireConvert[O](fakeT, mt.Input)
+	assertEqual(t, mt.ExpectedOutput, out)
+
+	if mt.ExpectedTestFailure == fakeT.Failed() {
+		return // test passed as expected
+	}
+
+	if mt.ExpectedTestFailure {
+		t.Fatal("test should have failed, but it did not")
+	}
+	t.Error("test should not have failed, but it did")
+	// we know that the test failed, so we use the real testing.T to report the error
+	_ = safecast.RequireConvert[O](t, mt.Input)
+}
+
+func TestRequireConvert(t *testing.T) {
+	// [TestConvert] tested all the cases
+	// here we are simply checking that the test fails on errors
+
+	t.Run("no conversion error", func(t *testing.T) {
+		for name, tt := range map[string]TestableConvert{
+			"number": MapRequireConvertTest[int, uint8]{Input: 42, ExpectedOutput: 42},
+			"string": MapRequireConvertTest[string, uint8]{Input: "42", ExpectedOutput: 42},
+			"float":  MapRequireConvertTest[float64, uint8]{Input: 42.0, ExpectedOutput: 42},
+			"octal":  MapRequireConvertTest[string, uint8]{Input: "0o52", ExpectedOutput: 42},
+		} {
+			t.Run(name, func(t *testing.T) {
+				tt.TestConvert(t)
+			})
+		}
+	})
+
+	t.Run("test fail on error", func(t *testing.T) {
+		for name, tt := range map[string]TestableConvert{
+			"negative": MapRequireConvertTest[int, uint8]{Input: -1, ExpectedTestFailure: true},
+			"overflow": MapRequireConvertTest[int, uint8]{Input: math.MaxInt, ExpectedTestFailure: true},
+			"string":   MapRequireConvertTest[string, uint8]{Input: "cats", ExpectedTestFailure: true},
+		} {
+			t.Run(name, func(t *testing.T) {
+				tt.TestConvert(t)
+			})
+		}
+	})
+}
+
+// This example shows how to use [safecast.RequireConvert] to convert a value in a test
+//
+// Here t is a mock implementation of the [safecast.TestingT] interface
+// you can use any type that implements this interface, such as [*testing.T], [*testing.B], or [*testing.F]
+func ExampleRequireConvert_success() {
+	t := new(mockTestingT)
+
+	out := safecast.RequireConvert[uint8](t, 42.0)
+	fmt.Println(out, t.Failed())
+
+	// Output:
+	// 42 false
+}
+
+// mockTestingTExample is a mock implementation of the [safecast.TestingT] interface
+// its purpose is to display the error message in the [ExampleRequireConvert_failure].
+type mockTestingTExample struct {
+	failed bool
+}
+
+func (m *mockTestingTExample) Helper() {}
+
+func (m *mockTestingTExample) Fatal(args ...any) {
+	// here we simulate the behavior of [testing.T.Fatal] so it can be shown in the example output
+	fmt.Printf("--- FAIL:\n\t")
+	fmt.Println(args...)
+	m.failed = true
+}
+
+func (m mockTestingTExample) Failed() bool {
+	return m.failed
+}
+
+// This example shows how [safecast.RequireConvert] reacts when the conversion fails
+//
+// An error is raised via [testing.T.Fatal] if the conversion fails.
+func ExampleRequireConvert_failure() {
+	t := new(mockTestingTExample) // use *testing.T, *testing.B, or *testing.F here
+
+	_ = safecast.RequireConvert[uint8](t, "foo")
+	// here an error is raised via [testing.T.Fatal]
+
+	// Output:
+	// --- FAIL:
+	// 	conversion issue: cannot convert from string foo to uint8
 }
