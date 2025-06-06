@@ -74,6 +74,28 @@ func MustConvert[NumOut Number, NumIn Input](orig NumIn) NumOut {
 	return converted
 }
 
+// TestingT is an interface wrapper used by [RequireConvert] that we need for testing purposes.
+//
+// Only the methods used by [RequireConvert] are expected to be implemented.
+//
+// [*testing.T], [*testing.B], or [*testing.F] types satisfy this interface.
+type TestingT interface {
+	Helper()
+	Fatal(args ...any)
+}
+
+// RequireConvert is a test helper that calls [Convert] that converts the value to the desired type,
+// and fails the test if the conversion fails.
+func RequireConvert[NumOut Number, NumIn Input](t TestingT, orig NumIn) (converted NumOut) {
+	t.Helper()
+
+	converted, err := Convert[NumOut](orig)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return converted
+}
+
 func convertFromNumber[NumOut Number, NumIn Number](orig NumIn) (converted NumOut, err error) {
 	converted = NumOut(orig)
 
