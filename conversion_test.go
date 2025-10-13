@@ -1482,14 +1482,6 @@ func TestToFloat64(t *testing.T) {
 	})
 }
 
-func Map[T any, U any](fn func(v T) U, input []T) []U {
-	var output []U
-	for _, v := range input {
-		output = append(output, fn(v))
-	}
-	return output
-}
-
 type MapTest[TypeInput safecast.Input, TypeOutput safecast.Number] struct {
 	Input          TypeInput
 	ExpectedOutput TypeOutput
@@ -1497,7 +1489,9 @@ type MapTest[TypeInput safecast.Input, TypeOutput safecast.Number] struct {
 	ErrorContains  string
 }
 
-func (mt MapTest[I, O]) TestConvert(t *testing.T) {
+func (mt MapTest[I, O]) Run(t *testing.T) {
+	t.Helper()
+
 	// configure a helper to validate there is no panic
 	defer func(t *testing.T) {
 		t.Helper()
@@ -1524,10 +1518,6 @@ func (mt MapTest[I, O]) TestConvert(t *testing.T) {
 	assertEqual(t, mt.ExpectedOutput, out)
 }
 
-type TestableConvert interface {
-	TestConvert(t *testing.T)
-}
-
 func TestConvert(t *testing.T) {
 	t.Run("untyped integer", func(t *testing.T) {
 		out, err := safecast.Convert[uint](42)
@@ -1535,7 +1525,7 @@ func TestConvert(t *testing.T) {
 		assertEqual(t, uint(42), out)
 	})
 
-	for name, c := range map[string]TestableConvert{
+	for name, c := range map[string]TestRunner{
 		"int to float32":     MapTest[int, float32]{Input: 42, ExpectedOutput: 42},
 		"int to float64":     MapTest[int, float64]{Input: 42, ExpectedOutput: 42},
 		"int to int":         MapTest[int, int]{Input: 42, ExpectedOutput: 42},
@@ -1682,11 +1672,11 @@ func TestConvert(t *testing.T) {
 		"float64 to float64": MapTest[float64, float64]{Input: 42, ExpectedOutput: 42},
 	} {
 		t.Run(name, func(t *testing.T) {
-			c.TestConvert(t)
+			c.Run(t)
 		})
 	}
 
-	for name, c := range map[string]TestableConvert{
+	for name, c := range map[string]TestRunner{
 		"string integer":              MapTest[string, uint]{Input: "42", ExpectedOutput: 42},
 		"string with spaces":          MapTest[string, uint]{Input: "42 ", ExpectedOutput: 42},
 		"string float":                MapTest[string, uint]{Input: "42.0", ExpectedOutput: 42},
@@ -1712,13 +1702,13 @@ func TestConvert(t *testing.T) {
 		"invalid string with dash and dot":       MapTest[string, uint]{Input: "-ab.c", ExpectedError: safecast.ErrStringConversion},
 	} {
 		t.Run(name, func(t *testing.T) {
-			c.TestConvert(t)
+			c.Run(t)
 		})
 	}
 
 	negativeZero := math.Copysign(0, -1)
 	t.Run("convert to float32 near zero", func(t *testing.T) {
-		for name, tt := range map[string]TestableConvert{
+		for name, tt := range map[string]TestRunner{
 			"negative untyped zero":              MapTest[float64, float32]{Input: negativeZero, ExpectedOutput: float32(negativeZero)},
 			"smallest positive non-zero float32": MapTest[float64, float32]{Input: math.SmallestNonzeroFloat32, ExpectedOutput: 1e-45},
 			"smallest negative non-zero float32": MapTest[float64, float32]{Input: -math.SmallestNonzeroFloat32, ExpectedOutput: -1e-45},
@@ -1726,13 +1716,13 @@ func TestConvert(t *testing.T) {
 			"smallest negative non-zero float64": MapTest[float64, float32]{Input: -math.SmallestNonzeroFloat64, ExpectedOutput: -4.9e-324},
 		} {
 			t.Run(name, func(t *testing.T) {
-				tt.TestConvert(t)
+				tt.Run(t)
 			})
 		}
 	})
 
 	t.Run("convert to float64 near zero", func(t *testing.T) {
-		for name, tt := range map[string]TestableConvert{
+		for name, tt := range map[string]TestRunner{
 			"negative untyped zero":              MapTest[float64, float64]{Input: negativeZero, ExpectedOutput: negativeZero},
 			"smallest positive non-zero float32": MapTest[float64, float64]{Input: math.SmallestNonzeroFloat32, ExpectedOutput: 1.401298464324817e-45},
 			"smallest negative non-zero float32": MapTest[float64, float64]{Input: -math.SmallestNonzeroFloat32, ExpectedOutput: -1.401298464324817e-45},
@@ -1740,12 +1730,12 @@ func TestConvert(t *testing.T) {
 			"smallest negative non-zero float64": MapTest[float64, float64]{Input: -math.SmallestNonzeroFloat64, ExpectedOutput: -4.9e-324},
 		} {
 			t.Run(name, func(t *testing.T) {
-				tt.TestConvert(t)
+				tt.Run(t)
 			})
 		}
 	})
 
-	for name, c := range map[string]TestableConvert{
+	for name, c := range map[string]TestRunner{
 		"upper bound overflows for int": MapTest[uint, int]{
 			Input:         uint(math.MaxInt + 1),
 			ExpectedError: safecast.ErrExceedMaximumValue,
@@ -1814,11 +1804,11 @@ func TestConvert(t *testing.T) {
 		},
 	} {
 		t.Run(name, func(t *testing.T) {
-			c.TestConvert(t)
+			c.Run(t)
 		})
 	}
 
-	for name, c := range map[string]TestableConvert{
+	for name, c := range map[string]TestRunner{
 		"lower bound overflows for int": MapTest[float64, int]{
 			Input:         float64(math.MinInt * 1.01), // the float64 conversion is used to avoid overflow on 32-bit
 			ExpectedError: safecast.ErrExceedMinimumValue,
@@ -1843,6 +1833,7 @@ func TestConvert(t *testing.T) {
 		"lower bound overflows for float32": MapTest[float64, float32]{
 			Input:         -float64(math.MaxFloat32 * 1.01),
 			ExpectedError: safecast.ErrExceedMinimumValue,
+			ErrorContains: "float32", // this increases the test coverage of the specific error message for float32
 		},
 
 		// Note: float64 cannot overflow
@@ -1928,7 +1919,7 @@ func TestConvert(t *testing.T) {
 		},
 	} {
 		t.Run(name, func(t *testing.T) {
-			c.TestConvert(t)
+			c.Run(t)
 		})
 	}
 
@@ -1955,7 +1946,7 @@ func TestConvert(t *testing.T) {
 			BoolTypeAlias bool
 		)
 
-		for name, c := range map[string]TestableConvert{
+		for name, c := range map[string]TestRunner{
 			"integer simple alias": MapTest[UintSimpleAlias, int8]{
 				Input:          UintSimpleAlias(42),
 				ExpectedOutput: int8(42),
@@ -1999,7 +1990,7 @@ func TestConvert(t *testing.T) {
 			},
 		} {
 			t.Run(name, func(t *testing.T) {
-				c.TestConvert(t)
+				c.Run(t)
 			})
 		}
 	})
@@ -2011,7 +2002,7 @@ type MapMustConvertTest[TypeInput safecast.Input, TypeOutput safecast.Number] st
 	ExpectedError  error
 }
 
-func (mt MapMustConvertTest[I, O]) TestConvert(t *testing.T) {
+func (mt MapMustConvertTest[I, O]) Run(t *testing.T) {
 	t.Helper()
 
 	var out O
@@ -2052,53 +2043,30 @@ func TestMustConvert(t *testing.T) {
 	// here we are simply checking that the function panic on errors
 
 	t.Run("panic on error", func(t *testing.T) {
-		for name, tt := range map[string]TestableConvert{
+		for name, tt := range map[string]TestRunner{
 			"negative": MapMustConvertTest[int, uint8]{Input: -1, ExpectedError: safecast.ErrExceedMinimumValue},
 			"overflow": MapMustConvertTest[int, uint8]{Input: math.MaxInt, ExpectedError: safecast.ErrExceedMaximumValue},
 			"string":   MapMustConvertTest[string, uint8]{Input: "cats", ExpectedError: safecast.ErrStringConversion},
 		} {
 			t.Run(name, func(t *testing.T) {
-				tt.TestConvert(t)
+				tt.Run(t)
 			})
 		}
 	})
 
 	t.Run("no panic", func(t *testing.T) {
-		for name, tt := range map[string]TestableConvert{
+		for name, tt := range map[string]TestRunner{
 			"number": MapMustConvertTest[int, uint8]{Input: 42, ExpectedOutput: 42},
 			"string": MapMustConvertTest[string, uint8]{Input: "42", ExpectedOutput: 42},
 			"float":  MapMustConvertTest[float64, uint8]{Input: 42.0, ExpectedOutput: 42},
 			"octal":  MapMustConvertTest[string, uint8]{Input: "0o52", ExpectedOutput: 42},
 		} {
 			t.Run(name, func(t *testing.T) {
-				tt.TestConvert(t)
+				tt.Run(t)
 			})
 		}
 	})
 }
-
-// mockTestingT is a mock implementation of the safecast.TestingT interface
-// that captures the arguments passed to the Fatal method for testing purposes.
-type mockTestingT struct {
-	failed bool
-}
-
-func (m *mockTestingT) Helper() {}
-
-func (m *mockTestingT) Fatal(_ ...any) {
-	m.failed = true
-}
-
-func (m mockTestingT) Failed() bool {
-	return m.failed
-}
-
-// interfaces validation
-// this leads to a compile-time error if there is a mismatch
-var _ safecast.TestingT = new(testing.T)
-var _ safecast.TestingT = new(testing.B)
-var _ safecast.TestingT = new(testing.F)
-var _ safecast.TestingT = new(mockTestingT)
 
 type MapRequireConvertTest[TypeInput safecast.Input, TypeOutput safecast.Number] struct {
 	Input               TypeInput
@@ -2106,7 +2074,7 @@ type MapRequireConvertTest[TypeInput safecast.Input, TypeOutput safecast.Number]
 	ExpectedTestFailure bool
 }
 
-func (mt MapRequireConvertTest[I, O]) TestConvert(t *testing.T) {
+func (mt MapRequireConvertTest[I, O]) Run(t *testing.T) {
 	t.Helper()
 
 	// We need to use a fake testing.T to avoid the test failing when we expect a failure
@@ -2131,26 +2099,26 @@ func TestRequireConvert(t *testing.T) {
 	// here we are simply checking that the test fails on errors
 
 	t.Run("no conversion error", func(t *testing.T) {
-		for name, tt := range map[string]TestableConvert{
+		for name, tt := range map[string]TestRunner{
 			"number": MapRequireConvertTest[int, uint8]{Input: 42, ExpectedOutput: 42},
 			"string": MapRequireConvertTest[string, uint8]{Input: "42", ExpectedOutput: 42},
 			"float":  MapRequireConvertTest[float64, uint8]{Input: 42.0, ExpectedOutput: 42},
 			"octal":  MapRequireConvertTest[string, uint8]{Input: "0o52", ExpectedOutput: 42},
 		} {
 			t.Run(name, func(t *testing.T) {
-				tt.TestConvert(t)
+				tt.Run(t)
 			})
 		}
 	})
 
 	t.Run("test fail on error", func(t *testing.T) {
-		for name, tt := range map[string]TestableConvert{
+		for name, tt := range map[string]TestRunner{
 			"negative": MapRequireConvertTest[int, uint8]{Input: -1, ExpectedTestFailure: true},
 			"overflow": MapRequireConvertTest[int, uint8]{Input: math.MaxInt, ExpectedTestFailure: true},
 			"string":   MapRequireConvertTest[string, uint8]{Input: "cats", ExpectedTestFailure: true},
 		} {
 			t.Run(name, func(t *testing.T) {
-				tt.TestConvert(t)
+				tt.Run(t)
 			})
 		}
 	})
@@ -2200,5 +2168,5 @@ func ExampleRequireConvert_failure() {
 
 	// Output:
 	// --- FAIL:
-	// 	conversion issue: cannot convert from string foo to uint8
+	// 	conversion issue: cannot convert from string foo to uint8 (base auto-detection)
 }

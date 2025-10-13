@@ -222,7 +222,7 @@ func ExampleConvert() {
 	// 17 <nil>
 	// 0 conversion issue: -1 (int8) is less than 0 (uint): minimum value for this type exceeded
 	// 0 conversion issue: -1 (int64) is less than 0 (uint): minimum value for this type exceeded
-	// 0 conversion issue: cannot convert from string abc to uint
+	// 0 conversion issue: cannot convert from string abc to uint (base auto-detection)
 	// 0 conversion issue: -1.1 (float64) is less than 0 (uint): minimum value for this type exceeded
 	// 12345 <nil>
 }

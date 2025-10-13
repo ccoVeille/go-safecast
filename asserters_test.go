@@ -9,6 +9,41 @@ import (
 	"github.com/ccoveille/go-safecast"
 )
 
+// mockTestingT is a mock implementation of the safecast.TestingT interface
+// that captures the arguments passed to the Fatal method for testing purposes.
+type mockTestingT struct {
+	failed bool
+}
+
+func (m *mockTestingT) Helper() {}
+
+func (m *mockTestingT) Fatal(_ ...any) {
+	m.failed = true
+}
+
+func (m mockTestingT) Failed() bool {
+	return m.failed
+}
+
+func Map[T any, U any](fn func(v T) U, input []T) []U {
+	var output []U
+	for _, v := range input {
+		output = append(output, fn(v))
+	}
+	return output
+}
+
+type TestRunner interface {
+	Run(t *testing.T)
+}
+
+// interfaces validation
+// this leads to a compile-time error if there is a mismatch
+var _ safecast.TestingT = new(testing.T)
+var _ safecast.TestingT = new(testing.B)
+var _ safecast.TestingT = new(testing.F)
+var _ safecast.TestingT = new(mockTestingT)
+
 func assertEqual[V comparable](t *testing.T, expected, got V) {
 	t.Helper()
 

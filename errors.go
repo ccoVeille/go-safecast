@@ -26,20 +26,24 @@ var ErrStringConversion = errors.New("cannot convert from string")
 
 // errorHelper is a helper struct for error messages
 // It is used to wrap other errors, and provides additional information
-type errorHelper struct {
-	value    any
-	boundary any
-	err      error
+type errorHelper[NumOut Number] struct {
+	value any
+	err   error
 }
 
-func (e errorHelper) Error() string {
+func (e errorHelper[NumOut]) Error() string {
 	errMessage := ErrConversionIssue.Error()
 
 	switch {
 	case errors.Is(e.err, ErrExceedMaximumValue):
-		errMessage = fmt.Sprintf("%s: %v (%T) is greater than %v (%T)", errMessage, e.value, e.value, e.boundary, e.boundary)
+		boundary := maxOf[NumOut]()
+		errMessage = fmt.Sprintf("%s: %v (%T) is greater than %v (%T)", errMessage, e.value, e.value, boundary, boundary)
 	case errors.Is(e.err, ErrExceedMinimumValue):
-		errMessage = fmt.Sprintf("%s: %v (%T) is less than %v (%T)", errMessage, e.value, e.value, e.boundary, e.boundary)
+		boundary := minOf[NumOut]()
+		errMessage = fmt.Sprintf("%s: %v (%T) is less than %v (%T)", errMessage, e.value, e.value, boundary, boundary)
+	case errors.Is(e.err, ErrStringConversion):
+		targetType := NumOut(0)
+		return fmt.Sprintf("%s: cannot convert from string %s to %T (base auto-detection)", errMessage, e.value, targetType)
 	}
 
 	if e.err != nil {
@@ -48,7 +52,7 @@ func (e errorHelper) Error() string {
 	return errMessage
 }
 
-func (e errorHelper) Unwrap() []error {
+func (e errorHelper[NumOut]) Unwrap() []error {
 	errs := []error{ErrConversionIssue}
 	if e.err != nil {
 		switch {
