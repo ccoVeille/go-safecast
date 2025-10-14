@@ -1736,6 +1736,36 @@ func TestConvert(t *testing.T) {
 	})
 
 	for name, c := range map[string]TestRunner{
+		"math.Inf to float64": MapTest[float64, float64]{
+			Input:         math.Inf(1),
+			ExpectedError: safecast.ErrExceedMaximumValue,
+			ErrorContains: "+Inf (float64) is greater than 1.7976931348623157e+308",
+		},
+		"-math.Inf to float64": MapTest[float64, float64]{
+			Input:         math.Inf(-1),
+			ExpectedError: safecast.ErrExceedMinimumValue,
+			ErrorContains: "-Inf (float64) is less than -1.7976931348623157e+308",
+		},
+		"math.NaN to float64": MapTest[float64, float64]{
+			Input:         math.NaN(),
+			ExpectedError: safecast.ErrUnsupportedConversion,
+			ErrorContains: "NaN (float64) is not supported",
+		},
+		"math.Inf to float32": MapTest[float64, float32]{
+			Input:         math.Inf(1),
+			ExpectedError: safecast.ErrExceedMaximumValue,
+			ErrorContains: "+Inf (float64) is greater than 3.4028235e+38",
+		},
+		"-math.Inf to float32": MapTest[float64, float32]{
+			Input:         math.Inf(-1),
+			ExpectedError: safecast.ErrExceedMinimumValue,
+			ErrorContains: "-Inf (float64) is less than -3.4028235e+38",
+		},
+		"math.NaN to float32": MapTest[float64, float32]{
+			Input:         math.NaN(),
+			ExpectedError: safecast.ErrUnsupportedConversion,
+			ErrorContains: "NaN (float64) is not supported",
+		},
 		"upper bound overflows for int": MapTest[uint, int]{
 			Input:         uint(math.MaxInt + 1),
 			ExpectedError: safecast.ErrExceedMaximumValue,

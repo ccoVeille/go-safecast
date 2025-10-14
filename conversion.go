@@ -97,6 +97,19 @@ func RequireConvert[NumOut Number, NumIn Input](t TestingT, orig NumIn) (convert
 
 func convertFromNumber[NumOut Number, NumIn Number](orig NumIn) (NumOut, error) {
 	converted := NumOut(orig)
+	if isFloat64[NumIn]() {
+		floatOrig := float64(orig)
+		if math.IsInf(floatOrig, 1) || math.IsInf(floatOrig, -1) {
+			return 0, getRangeError[NumOut](orig)
+		}
+		if math.IsNaN(floatOrig) {
+			return 0, errorHelper[NumOut]{
+				value: orig,
+				err:   ErrUnsupportedConversion,
+			}
+		}
+	}
+
 	if isFloat64[NumOut]() {
 		// float64 cannot overflow, so we don't have to worry about it
 		return converted, nil
