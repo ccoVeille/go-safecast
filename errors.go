@@ -41,6 +41,8 @@ func (e errorHelper[NumOut]) Error() string {
 	case errors.Is(e.err, ErrExceedMinimumValue):
 		boundary := minOf[NumOut]()
 		errMessage = fmt.Sprintf("%s: %v (%T) is less than %v (%T)", errMessage, e.value, e.value, boundary, boundary)
+	case errors.Is(e.err, ErrUnsupportedConversion):
+		errMessage = fmt.Sprintf("%s: %v (%T) is not supported", errMessage, e.value, e.value)
 	case errors.Is(e.err, ErrStringConversion):
 		targetType := NumOut(0)
 		return fmt.Sprintf("%s: cannot convert from string %s to %T (base auto-detection)", errMessage, e.value, targetType)
