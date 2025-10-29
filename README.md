@@ -25,41 +25,40 @@ import (
 )
 
 func main() {
-  var a int
+  var a int64
 
   a = 42
-  b, err := safecast.ToUint8(a) // everything is fine
+  b, err := safecast.Convert[int16](a) // everything is fine because 42 fits in int16
   if err != nil {
     fmt.Println(err)
   }
   fmt.Println(b)
-  // Output: 42
 
   a = 255 + 1
-  _, err = safecast.ToUint8(a) // 256 is greater than uint8 maximum value
+  _, err = safecast.Convert[uint8](a) // 256 is greater than uint8 maximum value
   if err != nil {
+    // Output: conversion issue: 256 (int64) is greater than 255 (uint8): maximum value for this type exceeded
     fmt.Println(err)
-    // Output: conversion issue: 256 (int) is greater than 255 (uint8): maximum value for this type exceeded
   }
 
   a = -1
-  _, err = safecast.ToUint8(a) // -1 cannot fit in uint8
+  _, err = safecast.Convert[uint64](a) // -1 cannot fit in uint64
   if err != nil {
+    // Output: conversion issue: -1 (int64) is less than 0 (uint64): minimum value for this type exceeded
     fmt.Println(err)
-    // Output: conversion issue: -1 (int) is less than 0 (uint8): minimum value for this type exceeded
   }
 
   str := "\x99" // ASCII code 153 for Trademark symbol
-  e := str[0]
-  _, err = safecast.ToInt8(e)
+  e := str[0] // e is a rune (uint8)
+  _, err = safecast.Convert[int8](e)
   if err != nil {
-    fmt.Println(err)
     // Output: conversion issue: 153 (uint8) is greater than 127 (int8): maximum value for this type exceeded
+    fmt.Println(err)
   }
 }
 ```
 
-[Go Playground](https://go.dev/play/p/nelJshulOnj)
+[Go Playground](https://go.dev/play/p/OC9ueLHY0D2)
 
 ## Conversion issues
 

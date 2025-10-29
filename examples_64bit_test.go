@@ -32,3 +32,20 @@ func ExampleToInt() {
 	// 42 <nil>
 	// 0 conversion issue: 3.4028235e+38 (float32) is greater than 9223372036854775807 (int): maximum value for this type exceeded
 }
+
+func ExampleToInt_deprecation() {
+	// Example showing the use of the [safecast.Convert] function as a replacement for the deprecated [safecast.ToInt] function.
+
+	a := uint64(42)
+	i, err := safecast.Convert[int](a)
+	fmt.Println(i, err)
+
+	b := float32(math.MaxFloat32)
+	_, err = safecast.Convert[int](b)
+
+	fmt.Println(err)
+
+	// Output:
+	// 42 <nil>
+	// conversion issue: 3.4028235e+38 (float32) is greater than 9223372036854775807 (int): maximum value for this type exceeded
+}
