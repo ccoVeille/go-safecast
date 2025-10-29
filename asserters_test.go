@@ -79,7 +79,7 @@ func requireErrorContains(t *testing.T, err error, text string) {
 
 	errMessage := err.Error()
 	if !strings.Contains(errMessage, text) {
-		t.Fatalf("error message should contain %q: %q", text, errMessage)
+		t.Fatalf("error message should contain %#q: %#q", text, errMessage)
 	}
 }
 

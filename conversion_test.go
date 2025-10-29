@@ -1693,33 +1693,33 @@ func TestConvert(t *testing.T) {
 		"empty string": MapTest[string, uint]{
 			Input:         "",
 			ExpectedError: safecast.ErrStringConversion,
-			ErrorContains: "cannot convert from string  to uint",
+			ErrorContains: "cannot convert from `` to uint",
 		},
 		"simple space": MapTest[string, uint]{
 			Input:         " ",
 			ExpectedError: safecast.ErrStringConversion,
-			ErrorContains: "cannot convert from string   to uint",
+			ErrorContains: "cannot convert from ` ` to uint",
 		},
 		"simple dot": MapTest[string, uint]{
 			Input:         ".",
 			ExpectedError: safecast.ErrStringConversion,
-			ErrorContains: "cannot convert from string . to uint"},
+			ErrorContains: "cannot convert from `.` to uint"},
 		"simple dash": MapTest[string, uint]{
 			Input:         "-",
 			ExpectedError: safecast.ErrStringConversion,
-			ErrorContains: "cannot convert from string - to uint"},
+			ErrorContains: "cannot convert from `-` to uint"},
 		"invalid string": MapTest[string, uint]{
 			Input:         "abc",
 			ExpectedError: safecast.ErrStringConversion,
-			ErrorContains: `cannot convert from string abc to uint`},
+			ErrorContains: "cannot convert from `abc` to uint"},
 		"invalid string with dot": MapTest[string, uint]{
 			Input:         "ab.c",
 			ExpectedError: safecast.ErrStringConversion,
-			ErrorContains: `cannot convert from string ab.c to uint`},
+			ErrorContains: "cannot convert from `ab.c` to uint"},
 		"strings with leading +": MapTest[string, uint]{
 			Input:         "+42",
 			ExpectedError: safecast.ErrStringConversion,
-			ErrorContains: "cannot convert from string +42 to uint",
+			ErrorContains: "cannot convert from `+42` to uint",
 		},
 		"invalid string multiple leading dashes": MapTest[string, uint]{Input: "--42", ExpectedError: safecast.ErrStringConversion},
 		"invalid string with dash":               MapTest[string, uint]{Input: "-abc", ExpectedError: safecast.ErrStringConversion},
@@ -2222,5 +2222,5 @@ func ExampleRequireConvert_failure() {
 
 	// Output:
 	// --- FAIL:
-	// 	conversion issue: cannot convert from string foo to uint8 (base auto-detection)
+	// 	conversion issue: cannot convert from `foo` to uint8 (base auto-detection)
 }
