@@ -1,4 +1,4 @@
-//go:build i386 || arm
+//go:build 386 || arm
 
 package safecast_test
 
