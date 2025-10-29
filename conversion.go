@@ -216,9 +216,11 @@ func getRangeError[NumOut Number, NumIn Number](value NumIn) error {
 	}
 }
 
-// ToInt attempts to convert any [Type] value to an int.
+// ToInt attempts to convert any [Number] value to an int.
 // If the conversion results in a value outside the range of an int,
 // an [ErrConversionIssue] error is returned.
+//
+// Deprecated: use [Convert] instead with Convert[int](i)
 func ToInt[T Number](i T) (int, error) {
 	return convertFromNumber[int](i)
 }
@@ -226,6 +228,8 @@ func ToInt[T Number](i T) (int, error) {
 // ToUint attempts to convert any [Number] value to an uint.
 // If the conversion results in a value outside the range of an uint,
 // an [ErrConversionIssue] error is returned.
+//
+// Deprecated: use [Convert] instead with Convert[uint](i)
 func ToUint[T Number](i T) (uint, error) {
 	return convertFromNumber[uint](i)
 }
@@ -233,6 +237,8 @@ func ToUint[T Number](i T) (uint, error) {
 // ToInt8 attempts to convert any [Number] value to an int8.
 // If the conversion results in a value outside the range of an int8,
 // an [ErrConversionIssue] error is returned.
+//
+// Deprecated: use [Convert] instead with Convert[int8](i)
 func ToInt8[T Number](i T) (int8, error) {
 	return convertFromNumber[int8](i)
 }
@@ -240,6 +246,8 @@ func ToInt8[T Number](i T) (int8, error) {
 // ToUint8 attempts to convert any [Number] value to an uint8.
 // If the conversion results in a value outside the range of an uint8,
 // an [ErrConversionIssue] error is returned.
+//
+// Deprecated: use [Convert] instead with Convert[uint8](i)
 func ToUint8[T Number](i T) (uint8, error) {
 	return convertFromNumber[uint8](i)
 }
@@ -247,6 +255,8 @@ func ToUint8[T Number](i T) (uint8, error) {
 // ToInt16 attempts to convert any [Number] value to an int16.
 // If the conversion results in a value outside the range of an int16,
 // an [ErrConversionIssue] error is returned.
+//
+// Deprecated: use [Convert] instead with Convert[int16](i)
 func ToInt16[T Number](i T) (int16, error) {
 	return convertFromNumber[int16](i)
 }
@@ -254,6 +264,8 @@ func ToInt16[T Number](i T) (int16, error) {
 // ToUint16 attempts to convert any [Number] value to an uint16.
 // If the conversion results in a value outside the range of an uint16,
 // an [ErrConversionIssue] error is returned.
+//
+// Deprecated: use [Convert] instead with Convert[uint16](i)
 func ToUint16[T Number](i T) (uint16, error) {
 	return convertFromNumber[uint16](i)
 }
@@ -261,6 +273,8 @@ func ToUint16[T Number](i T) (uint16, error) {
 // ToInt32 attempts to convert any [Number] value to an int32.
 // If the conversion results in a value outside the range of an int32,
 // an [ErrConversionIssue] error is returned.
+//
+// Deprecated: use [Convert] instead with Convert[int32](i)
 func ToInt32[T Number](i T) (int32, error) {
 	return convertFromNumber[int32](i)
 }
@@ -268,6 +282,8 @@ func ToInt32[T Number](i T) (int32, error) {
 // ToUint32 attempts to convert any [Number] value to an uint32.
 // If the conversion results in a value outside the range of an uint32,
 // an [ErrConversionIssue] error is returned.
+//
+// Deprecated: use [Convert] instead with Convert[uint32](i)
 func ToUint32[T Number](i T) (uint32, error) {
 	return convertFromNumber[uint32](i)
 }
@@ -275,6 +291,8 @@ func ToUint32[T Number](i T) (uint32, error) {
 // ToInt64 attempts to convert any [Number] value to an int64.
 // If the conversion results in a value outside the range of an int64,
 // an [ErrConversionIssue] error is returned.
+//
+// Deprecated: use [Convert] instead with Convert[int64](i)
 func ToInt64[T Number](i T) (int64, error) {
 	return convertFromNumber[int64](i)
 }
@@ -282,6 +300,8 @@ func ToInt64[T Number](i T) (int64, error) {
 // ToUint64 attempts to convert any [Number] value to an uint64.
 // If the conversion results in a value outside the range of an uint64,
 // an [ErrConversionIssue] error is returned.
+//
+// Deprecated: use [Convert] instead with Convert[uint64](i)
 func ToUint64[T Number](i T) (uint64, error) {
 	return convertFromNumber[uint64](i)
 }
@@ -289,6 +309,8 @@ func ToUint64[T Number](i T) (uint64, error) {
 // ToFloat32 attempts to convert any [Number] value to a float32.
 // If the conversion results in a value outside the range of a float32,
 // an [ErrConversionIssue] error is returned.
+//
+// Deprecated: use [Convert] instead with Convert[float32](i)
 func ToFloat32[T Number](i T) (float32, error) {
 	return convertFromNumber[float32](i)
 }
@@ -296,6 +318,8 @@ func ToFloat32[T Number](i T) (float32, error) {
 // ToFloat64 attempts to convert any [Number] value to a float64.
 // If the conversion results in a value outside the range of a float64,
 // an [ErrConversionIssue] error is returned.
+//
+// Deprecated: use [Convert] instead with Convert[float64](i)
 func ToFloat64[T Number](i T) (float64, error) {
 	return convertFromNumber[float64](i)
 }

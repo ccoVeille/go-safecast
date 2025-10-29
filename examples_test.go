@@ -32,6 +32,22 @@ func ExampleToInt8() {
 	// 0 conversion issue: 200.42 (float64) is greater than 127 (int8): maximum value for this type exceeded
 }
 
+func ExampleToInt8_deprecation() {
+	// Example showing the use of the [safecast.Convert] function as a replacement for the deprecated [safecast.ToInt8] function.
+
+	a := float64(42.42)
+	i, err := safecast.Convert[int8](a)
+	fmt.Println(i, err)
+
+	a = float64(200.42)
+	_, err = safecast.Convert[int8](a)
+	fmt.Println(err)
+
+	// Output:
+	// 42 <nil>
+	// conversion issue: 200.42 (float64) is greater than 127 (int8): maximum value for this type exceeded
+}
+
 func ExampleToUint8() {
 	a := int64(42)
 	i, err := safecast.ToUint8(a)
@@ -44,6 +60,21 @@ func ExampleToUint8() {
 	// Output:
 	// 42 <nil>
 	// 0 conversion issue: -1 (int64) is less than 0 (uint8): minimum value for this type exceeded
+}
+
+func ExampleToUint8_deprecation() {
+	// Example showing the use of the [safecast.Convert] function as a replacement for the deprecated [safecast.ToUint8] function.
+
+	a := int64(42)
+	i, err := safecast.Convert[uint8](a)
+	fmt.Println(i, err)
+	a = int64(-1)
+	_, err = safecast.Convert[uint8](a)
+	fmt.Println(err)
+
+	// Output:
+	// 42 <nil>
+	// conversion issue: -1 (int64) is less than 0 (uint8): minimum value for this type exceeded
 }
 
 func ExampleToInt16() {
@@ -59,6 +90,22 @@ func ExampleToInt16() {
 	// 0 conversion issue: 40000 (int32) is greater than 32767 (int16): maximum value for this type exceeded
 }
 
+func ExampleToInt16_deprecation() {
+	// Example showing the use of the [safecast.Convert] function as a replacement for the deprecated [safecast.ToInt16] function.
+
+	a := int32(42)
+	i, err := safecast.Convert[int16](a)
+	fmt.Println(i, err)
+
+	a = int32(40000)
+	_, err = safecast.Convert[int16](a)
+	fmt.Println(err)
+
+	// Output:
+	// 42 <nil>
+	// conversion issue: 40000 (int32) is greater than 32767 (int16): maximum value for this type exceeded
+}
+
 func ExampleToUint16() {
 	a := int64(42)
 	i, err := safecast.ToUint16(a)
@@ -70,6 +117,22 @@ func ExampleToUint16() {
 	// Output:
 	// 42 <nil>
 	// 0 conversion issue: -1 (int64) is less than 0 (uint16): minimum value for this type exceeded
+}
+
+func ExampleToUint16_deprecation() {
+	// Example showing the use of the [safecast.Convert] function as a replacement for the deprecated [safecast.ToUint16] function.
+
+	a := int64(42)
+	i, err := safecast.Convert[uint16](a)
+	fmt.Println(i, err)
+
+	a = int64(-1)
+	_, err = safecast.Convert[uint16](a)
+	fmt.Println(err)
+
+	// Output:
+	// 42 <nil>
+	// conversion issue: -1 (int64) is less than 0 (uint16): minimum value for this type exceeded
 }
 
 func ExampleToInt32() {
@@ -86,6 +149,22 @@ func ExampleToInt32() {
 	// 0 conversion issue: 2147483648 (uint32) is greater than 2147483647 (int32): maximum value for this type exceeded
 }
 
+func ExampleToInt32_deprecation() {
+	// Example showing the use of the [safecast.Convert] function as a replacement for the deprecated [safecast.ToInt32] function.
+
+	a := int(42)
+	i, err := safecast.Convert[int32](a)
+	fmt.Println(i, err)
+
+	b := uint32(math.MaxInt32) + 1
+	_, err = safecast.Convert[int32](b)
+	fmt.Println(err)
+
+	// Output:
+	// 42 <nil>
+	// conversion issue: 2147483648 (uint32) is greater than 2147483647 (int32): maximum value for this type exceeded
+}
+
 func ExampleToUint32() {
 	a := int16(42)
 	i, err := safecast.ToUint32(a)
@@ -100,6 +179,18 @@ func ExampleToUint32() {
 	// 0 conversion issue: -1 (int16) is less than 0 (uint32): minimum value for this type exceeded
 }
 
+func ExampleToUint32_deprecation() {
+	// Example showing the use of the [safecast.Convert] function as a replacement for the deprecated [safecast.ToUint32] function.
+
+	a := int16(42)
+	i, err := safecast.Convert[uint32](a)
+	fmt.Println(i, err)
+
+	a = int16(-1)
+	_, err = safecast.Convert[uint32](a)
+	fmt.Println(err)
+}
+
 func ExampleToInt64() {
 	a := uint64(42)
 	i, err := safecast.ToInt64(a)
@@ -112,6 +203,22 @@ func ExampleToInt64() {
 	// Output:
 	// 42 <nil>
 	// 0 conversion issue: 9223372036854775808 (uint64) is greater than 9223372036854775807 (int64): maximum value for this type exceeded
+}
+
+func ExampleToInt64_deprecation() {
+	// Example showing the use of the [safecast.Convert] function as a replacement for the deprecated [safecast.ToInt64] function.
+
+	a := uint64(42)
+	i, err := safecast.Convert[uint64](a)
+	fmt.Println(i, err)
+
+	a = uint64(math.MaxInt64) + 1
+	_, err = safecast.Convert[int64](a)
+	fmt.Println(err)
+
+	// Output:
+	// 42 <nil>
+	// conversion issue: 9223372036854775808 (uint64) is greater than 9223372036854775807 (int64): maximum value for this type exceeded
 }
 
 func ExampleToUint64() {
@@ -142,6 +249,22 @@ func ExampleToUint() {
 	// 0 conversion issue: -1 (int8) is less than 0 (uint): minimum value for this type exceeded
 }
 
+func ExampleToUint64_deprecation() {
+	// Example showing the use of the [safecast.Convert] function as a replacement for the deprecated [safecast.ToUint64] function.
+
+	a := int8(42)
+	i, err := safecast.Convert[uint64](a)
+	fmt.Println(i, err)
+
+	a = int8(-1)
+	_, err = safecast.Convert[uint64](a)
+	fmt.Println(err)
+
+	// Output:
+	// 42 <nil>
+	// conversion issue: -1 (int8) is less than 0 (uint64): minimum value for this type exceeded
+}
+
 func ExampleToFloat32() {
 	a := int8(42)
 	i, err := safecast.ToFloat32(a)
@@ -156,6 +279,22 @@ func ExampleToFloat32() {
 	// 0 conversion issue: 1.7976931348623157e+308 (float64) is greater than 3.4028235e+38 (float32): maximum value for this type exceeded
 }
 
+func ExampleToFloat32_deprecation() {
+	// Example showing the use of the [safecast.Convert] function as a replacement for the deprecated [safecast.ToFloat32] function.
+
+	a := int8(42)
+	i, err := safecast.Convert[float32](a)
+	fmt.Println(i, err)
+
+	b := math.MaxFloat64
+	_, err = safecast.Convert[float32](b)
+	fmt.Println(err)
+
+	// Output:
+	// 42 <nil>
+	// conversion issue: 1.7976931348623157e+308 (float64) is greater than 3.4028235e+38 (float32): maximum value for this type exceeded
+}
+
 func ExampleToFloat64() {
 	a := int8(42)
 	i, err := safecast.ToFloat64(a)
@@ -163,6 +302,22 @@ func ExampleToFloat64() {
 
 	b := math.MaxFloat64
 	i, err = safecast.ToFloat64(b)
+	fmt.Println(i, err)
+
+	// Output:
+	// 42 <nil>
+	// 1.7976931348623157e+308 <nil>
+}
+
+func ExampleToFloat64_deprecation() {
+	// Example showing the use of the [safecast.Convert] function as a replacement for the deprecated [safecast.ToFloat64] function.
+
+	a := int8(42)
+	i, err := safecast.Convert[float64](a)
+	fmt.Println(i, err)
+
+	b := math.MaxFloat64
+	i, err = safecast.Convert[float64](b)
 	fmt.Println(i, err)
 
 	// Output:
