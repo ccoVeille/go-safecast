@@ -1698,7 +1698,7 @@ func TestConvert(t *testing.T) {
 		"simple space": MapTest[string, uint]{
 			Input:         " ",
 			ExpectedError: safecast.ErrStringConversion,
-			ErrorContains: "cannot convert from string  to uint",
+			ErrorContains: "cannot convert from string   to uint",
 		},
 		"simple dot": MapTest[string, uint]{
 			Input:         ".",
