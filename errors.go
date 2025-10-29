@@ -45,7 +45,7 @@ func (e errorHelper[NumOut]) Error() string {
 		errMessage = fmt.Sprintf("%s: %v (%T) is not supported", errMessage, e.value, e.value)
 	case errors.Is(e.err, ErrStringConversion):
 		targetType := NumOut(0)
-		return fmt.Sprintf("%s: cannot convert from string %s to %T (base auto-detection)", errMessage, e.value, targetType)
+		return fmt.Sprintf("%s: cannot convert from %#q to %T (base auto-detection)", errMessage, e.value, targetType)
 	}
 
 	if e.err != nil {

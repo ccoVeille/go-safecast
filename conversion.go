@@ -146,10 +146,10 @@ func convertFromNumber[NumOut Number, NumIn Number](orig NumIn) (NumOut, error) 
 	return converted, nil
 }
 
-func convertFromString[NumOut Number](s string) (converted NumOut, err error) {
+func convertFromString[NumOut Number](input string) (converted NumOut, err error) {
 	numberBase := 0
 
-	s = strings.TrimSpace(s)
+	s := strings.TrimSpace(input)
 
 	if b, err := strconv.ParseBool(s); err == nil {
 		if b {
@@ -162,7 +162,7 @@ func convertFromString[NumOut Number](s string) (converted NumOut, err error) {
 		o, err := strconv.ParseFloat(s, 64)
 		if err != nil {
 			return 0, errorHelper[NumOut]{
-				value: s,
+				value: input,
 				err:   ErrStringConversion,
 			}
 		}
@@ -174,12 +174,12 @@ func convertFromString[NumOut Number](s string) (converted NumOut, err error) {
 		if err != nil {
 			if errors.Is(err, strconv.ErrRange) {
 				return 0, errorHelper[NumOut]{
-					value: s,
+					value: input,
 					err:   ErrExceedMinimumValue,
 				}
 			}
 			return 0, errorHelper[NumOut]{
-				value: s,
+				value: input,
 				err:   ErrStringConversion,
 			}
 		}
@@ -191,13 +191,13 @@ func convertFromString[NumOut Number](s string) (converted NumOut, err error) {
 	if err != nil {
 		if errors.Is(err, strconv.ErrRange) {
 			return 0, errorHelper[NumOut]{
-				value: s,
+				value: input,
 				err:   ErrExceedMaximumValue,
 			}
 		}
 
 		return 0, errorHelper[NumOut]{
-			value: s,
+			value: input,
 			err:   ErrStringConversion,
 		}
 	}
