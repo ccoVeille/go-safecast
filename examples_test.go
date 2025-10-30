@@ -14,11 +14,11 @@ func ExampleConvert() {
 	fmt.Println(c, err)
 
 	a := int8(-1)
-	i, err := safecast.Convert[uint](a)
+	i, err := safecast.Convert[uint16](a)
 	fmt.Println(i, err)
 
 	// Output:
 	// 17 <nil>
 	// 17 <nil>
-	// 0 conversion issue: -1 (int8) is less than 0 (uint): minimum value for this type exceeded
+	// 65535 conversion issue: -1 (int8) is less than 0 (uint16): minimum value for this type exceeded
 }
