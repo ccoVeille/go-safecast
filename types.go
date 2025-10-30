@@ -34,11 +34,6 @@ type Number interface {
 	Integer | Float
 }
 
-// Input is a constraint for all types that can be used as input for [Convert], and [MustConvert]
-type Input interface {
-	Number | ~string | ~bool
-}
-
 func isNegative[T Number](t T) bool {
 	return t < 0
 }
