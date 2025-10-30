@@ -1,7 +1,6 @@
 package safecast
 
 import (
-	"errors"
 	"math"
 	"reflect"
 	"strconv"
@@ -9,13 +8,30 @@ import (
 )
 
 // Convert attempts to convert any value to the desired type
+//
+// # Behavior
+//
 //   - If the conversion is possible, the converted value is returned.
-//   - If the conversion results in a value outside the range of the desired type, an [ErrRangeOverflow] error is wrapped in the returned error.
-//   - If the conversion exceeds the maximum value of the desired type, an [ErrExceedMaximumValue] error is wrapped in the returned error.
-//   - If the conversion exceeds the minimum value of the desired type, an [ErrExceedMinimumValue] error is wrapped in the returned error.
-//   - If the conversion is not possible for the desired type, an [ErrUnsupportedConversion] error is wrapped in the returned error.
-//   - If the conversion fails from string, an [ErrStringConversion] error is wrapped in the returned error.
-//   - If the conversion results in an error, an [ErrConversionIssue] error is wrapped in the returned error.
+//
+// # Errors when conversion exceeds range of the desired type, the following errors are wrapped in the returned error:
+//
+//   - [ErrRangeOverflow] when the value is outside the range of the desired type. (example: 1000 or -1 to uint8).
+//   - [ErrExceedMaximumValue] when the value exceeds the maximum value of the desired type (example: 1000 to uint8).
+//   - [ErrExceedMinimumValue] when the value is less than the minimum value of the desired type (example: -1 to uint16).
+//
+// # Errors when conversion is not possible, the following errors are wrapped in the returned error:
+//
+//   - [ErrorUnsupportedConversion] when the conversion is not possible for the desired type (example: NaN to int).
+//   - [ErrStringConversion] when the conversion from string fails (example: "abc" to int).
+//
+// # General errors wrapped on conversion failure:
+//
+//   - [ErrConversionIssue] is always wrapped in the returned error when [Convert] fails (example "abc", -1, or 1000 to uint8).
+//
+// # ⚠️ Note about string support
+//
+// ️️Please consider using [Parse] instead, which provides more options for string parsing.
+// The support of string input in this function will be deprecated in future major release.
 func Convert[NumOut Number, NumIn Input](orig NumIn) (converted NumOut, err error) {
 	v := reflect.ValueOf(orig)
 	switch v.Kind() {
@@ -147,8 +163,6 @@ func convertFromNumber[NumOut Number, NumIn Number](orig NumIn) (NumOut, error) 
 }
 
 func convertFromString[NumOut Number](input string) (converted NumOut, err error) {
-	numberBase := 0
-
 	s := strings.TrimSpace(input)
 
 	if b, err := strconv.ParseBool(s); err == nil {
@@ -156,52 +170,10 @@ func convertFromString[NumOut Number](input string) (converted NumOut, err error
 			return NumOut(1), nil
 		}
 		return NumOut(0), nil
+
 	}
 
-	if strings.Contains(s, ".") {
-		o, err := strconv.ParseFloat(s, 64)
-		if err != nil {
-			return 0, errorHelper[NumOut]{
-				value: input,
-				err:   ErrStringConversion,
-			}
-		}
-		return convertFromNumber[NumOut](o)
-	}
-
-	if strings.HasPrefix(s, "-") {
-		o, err := strconv.ParseInt(s, numberBase, 64)
-		if err != nil {
-			if errors.Is(err, strconv.ErrRange) {
-				return 0, errorHelper[NumOut]{
-					value: input,
-					err:   ErrExceedMinimumValue,
-				}
-			}
-			return 0, errorHelper[NumOut]{
-				value: input,
-				err:   ErrStringConversion,
-			}
-		}
-
-		return convertFromNumber[NumOut](o)
-	}
-
-	o, err := strconv.ParseUint(s, numberBase, 64)
-	if err != nil {
-		if errors.Is(err, strconv.ErrRange) {
-			return 0, errorHelper[NumOut]{
-				value: input,
-				err:   ErrExceedMaximumValue,
-			}
-		}
-
-		return 0, errorHelper[NumOut]{
-			value: input,
-			err:   ErrStringConversion,
-		}
-	}
-	return convertFromNumber[NumOut](o)
+	return Parse[NumOut](input, WithBaseAutoDetection(), withLegacyMode())
 }
 
 func getRangeError[NumOut Number, NumIn Number](value NumIn) error {
