@@ -13,7 +13,7 @@ import (
 	"math"
 	"testing"
 
-	"github.com/ccoveille/go-safecast"
+	"github.com/ccoveille/go-safecast/v2"
 )
 
 // TestConvert_64bit completes the [TestConvert] tests in conversion_test.go
