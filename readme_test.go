@@ -3,7 +3,7 @@ package safecast_test
 import (
 	"fmt"
 
-	"github.com/ccoveille/go-safecast"
+	"github.com/ccoveille/go-safecast/v2"
 )
 
 func Example() {
