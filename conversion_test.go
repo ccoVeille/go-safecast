@@ -529,8 +529,8 @@ func TestRequireConvert(t *testing.T) {
 
 	t.Run("test fail on error", func(t *testing.T) {
 		for name, tt := range map[string]TestRunner{
-			"negative": MapRequireConvertTest[int, uint8]{Input: -1, ExpectedTestFailure: true},
-			"overflow": MapRequireConvertTest[int, uint8]{Input: math.MaxInt, ExpectedTestFailure: true},
+			"negative": MapRequireConvertTest[int, uint8]{Input: -1, ExpectedTestFailure: true, ExpectedOutput: 255},
+			"overflow": MapRequireConvertTest[int, uint8]{Input: math.MaxInt, ExpectedTestFailure: true, ExpectedOutput: 255},
 		} {
 			t.Run(name, func(t *testing.T) {
 				tt.Run(t)
