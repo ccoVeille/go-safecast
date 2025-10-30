@@ -16,7 +16,7 @@ import (
 	"github.com/ccoveille/go-safecast"
 )
 
-type MapTest[TypeInput safecast.Input, TypeOutput safecast.Number] struct {
+type MapTest[TypeInput safecast.Number, TypeOutput safecast.Number] struct {
 	Input          TypeInput
 	ExpectedOutput TypeOutput
 	ExpectedError  error
@@ -210,60 +210,6 @@ func TestConvert(t *testing.T) {
 		})
 	}
 
-	for name, c := range map[string]TestRunner{
-		"string integer":              MapTest[string, uint]{Input: "42", ExpectedOutput: 42},
-		"string with spaces":          MapTest[string, uint]{Input: "42 ", ExpectedOutput: 42},
-		"string float":                MapTest[string, uint]{Input: "42.0", ExpectedOutput: 42},
-		"string true":                 MapTest[string, uint]{Input: "true", ExpectedOutput: 1},
-		"string false":                MapTest[string, uint]{Input: "false", ExpectedOutput: 0},
-		"string 10_0":                 MapTest[string, uint]{Input: "10_0", ExpectedOutput: 100},
-		"string binary":               MapTest[string, uint]{Input: "0b101010", ExpectedOutput: 42},
-		"string short octal notation": MapTest[string, uint]{Input: "042", ExpectedOutput: 34},
-		"string octal":                MapTest[string, uint]{Input: "0o42", ExpectedOutput: 34},
-		"string hexadecimal":          MapTest[string, uint]{Input: "0x42", ExpectedOutput: 66},
-		"boolean true":                MapTest[bool, uint]{Input: true, ExpectedOutput: 1},
-		"boolean false":               MapTest[bool, uint]{Input: false, ExpectedOutput: 0},
-
-		"empty string": MapTest[string, uint]{
-			Input:         "",
-			ExpectedError: safecast.ErrStringConversion,
-			ErrorContains: "cannot convert from `` to uint",
-		},
-		"simple space": MapTest[string, uint]{
-			Input:         " ",
-			ExpectedError: safecast.ErrStringConversion,
-			ErrorContains: "cannot convert from ` ` to uint",
-		},
-		"simple dot": MapTest[string, uint]{
-			Input:         ".",
-			ExpectedError: safecast.ErrStringConversion,
-			ErrorContains: "cannot convert from `.` to uint"},
-		"simple dash": MapTest[string, uint]{
-			Input:         "-",
-			ExpectedError: safecast.ErrStringConversion,
-			ErrorContains: "cannot convert from `-` to uint"},
-		"invalid string": MapTest[string, uint]{
-			Input:         "abc",
-			ExpectedError: safecast.ErrStringConversion,
-			ErrorContains: "cannot convert from `abc` to uint"},
-		"invalid string with dot": MapTest[string, uint]{
-			Input:         "ab.c",
-			ExpectedError: safecast.ErrStringConversion,
-			ErrorContains: "cannot convert from `ab.c` to uint"},
-		"strings with leading +": MapTest[string, uint]{
-			Input:         "+42",
-			ExpectedError: safecast.ErrStringConversion,
-			ErrorContains: "cannot convert from `+42` to uint",
-		},
-		"invalid string multiple leading dashes": MapTest[string, uint]{Input: "--42", ExpectedError: safecast.ErrStringConversion},
-		"invalid string with dash":               MapTest[string, uint]{Input: "-abc", ExpectedError: safecast.ErrStringConversion},
-		"invalid string with dash and dot":       MapTest[string, uint]{Input: "-ab.c", ExpectedError: safecast.ErrStringConversion},
-	} {
-		t.Run(name, func(t *testing.T) {
-			c.Run(t)
-		})
-	}
-
 	negativeZero := math.Copysign(0, -1)
 	t.Run("convert to float32 near zero", func(t *testing.T) {
 		for name, tt := range map[string]TestRunner{
@@ -364,32 +310,6 @@ func TestConvert(t *testing.T) {
 			Input:         float64(math.MaxUint64 * 1.01),
 			ExpectedError: safecast.ErrExceedMaximumValue,
 		},
-
-		"upper bound overflows for int string": MapTest[string, int]{
-			Input:         "9223372036854775808", // math.MaxInt64 + 1
-			ExpectedError: safecast.ErrExceedMaximumValue,
-		},
-		"upper bound overflows for int8 string": MapTest[string, int8]{
-			Input:         "129", // math.MaxInt8 + 1
-			ExpectedError: safecast.ErrExceedMaximumValue,
-		},
-		"upper bound overflows for int16 string": MapTest[string, int16]{
-			Input:         "32769", // math.MaxInt16 + 1
-			ExpectedError: safecast.ErrExceedMaximumValue,
-		},
-		"upper bound overflows for int32 string": MapTest[string, int32]{
-			Input:         "2147483648", // math.MaxInt32 + 1
-			ExpectedError: safecast.ErrExceedMaximumValue,
-		},
-		"upper bound overflows for int64 string": MapTest[string, int64]{
-			Input:         "9223372036854775808", // math.MaxInt64 + 1
-			ExpectedError: safecast.ErrExceedMaximumValue,
-		},
-
-		"upper bound overflows for int64 string overflow": MapTest[string, int64]{
-			Input:         "123456789012345678901234567890", // more characters than math.MaxInt64 represented as string
-			ExpectedError: safecast.ErrExceedMaximumValue,
-		},
 	} {
 		t.Run(name, func(t *testing.T) {
 			c.Run(t)
@@ -450,61 +370,6 @@ func TestConvert(t *testing.T) {
 			Input:         -42,
 			ExpectedError: safecast.ErrExceedMinimumValue,
 		},
-
-		"lower bound overflows int from string": MapTest[string, int]{
-			Input:         "-9223372036854775809", // math.MinInt64 - 1
-			ExpectedError: safecast.ErrExceedMinimumValue,
-		},
-
-		"lower bound overflows int8 from string": MapTest[string, int8]{
-			Input:         "-129", // math.MinInt8 - 1
-			ExpectedError: safecast.ErrExceedMinimumValue,
-		},
-
-		"lower bound overflows int16 from string": MapTest[string, int16]{
-			Input:         "-32769", // math.MinInt16 - 1
-			ExpectedError: safecast.ErrExceedMinimumValue,
-		},
-
-		"lower bound overflows int32 from string": MapTest[string, int32]{
-			Input:         "-2147483649", // math.MinInt32 - 1
-			ExpectedError: safecast.ErrExceedMinimumValue,
-		},
-
-		"lower bound overflows int64 from string": MapTest[string, int64]{
-			Input:         "-9223372036854775809", // math.MinInt64 - 1
-			ExpectedError: safecast.ErrExceedMinimumValue,
-		},
-
-		"lower bound overflows int64 from string overflow": MapTest[string, int64]{
-			Input:         "-123456789012345678901234567890", // more characters than math.MinInt64 represented as string
-			ExpectedError: safecast.ErrExceedMinimumValue,
-		},
-
-		"negative string overflows uint": MapTest[string, uint]{
-			Input:         "-1",
-			ExpectedError: safecast.ErrExceedMinimumValue,
-		},
-
-		"negative string overflows uint8": MapTest[string, uint8]{
-			Input:         "-1",
-			ExpectedError: safecast.ErrExceedMinimumValue,
-		},
-
-		"negative string overflows uint16": MapTest[string, uint16]{
-			Input:         "-1",
-			ExpectedError: safecast.ErrExceedMinimumValue,
-		},
-
-		"negative string overflows uint32": MapTest[string, uint32]{
-			Input:         "-1",
-			ExpectedError: safecast.ErrExceedMinimumValue,
-		},
-
-		"negative string overflows uint64": MapTest[string, uint64]{
-			Input:         "-1",
-			ExpectedError: safecast.ErrExceedMinimumValue,
-		},
 	} {
 		t.Run(name, func(t *testing.T) {
 			c.Run(t)
@@ -520,18 +385,6 @@ func TestConvert(t *testing.T) {
 
 			// UintTypeAlias is a type alias
 			UintTypeAlias uint
-
-			// StringAlias is an alias
-			StringAlias = string
-
-			// StringTypeAlias is a type alias
-			StringTypeAlias string
-
-			// BoolAlias is an alias
-			BoolAlias = bool
-
-			// BoolTypeAlias is a type alias
-			BoolTypeAlias bool
 		)
 
 		for name, c := range map[string]TestRunner{
@@ -545,26 +398,6 @@ func TestConvert(t *testing.T) {
 				ExpectedOutput: int8(42),
 			},
 
-			"string simple alias": MapTest[StringAlias, int8]{
-				Input:          StringAlias("42"),
-				ExpectedOutput: int8(42),
-			},
-
-			"string type alias": MapTest[StringTypeAlias, int8]{
-				Input:          StringTypeAlias("42"),
-				ExpectedOutput: int8(42),
-			},
-
-			"bool simple alias": MapTest[BoolAlias, int8]{
-				Input:          BoolAlias(true),
-				ExpectedOutput: int8(1),
-			},
-
-			"bool type alias": MapTest[BoolTypeAlias, int8]{
-				Input:          BoolTypeAlias(true),
-				ExpectedOutput: int8(1),
-			},
-
 			"simple alias overflows for int8": MapTest[UintSimpleAlias, int8]{
 				Input:         UintSimpleAlias(255),
 				ExpectedError: safecast.ErrExceedMaximumValue,
@@ -574,7 +407,7 @@ func TestConvert(t *testing.T) {
 			"type alias overflows for int8": MapTest[UintTypeAlias, int8]{
 				Input:         UintTypeAlias(255),
 				ExpectedError: safecast.ErrExceedMaximumValue,
-				ErrorContains: "255 (uint) is greater than 127 (int8)",
+				ErrorContains: "255 (safecast_test.UintTypeAlias) is greater than 127 (int8)",
 			},
 		} {
 			t.Run(name, func(t *testing.T) {
@@ -584,7 +417,7 @@ func TestConvert(t *testing.T) {
 	})
 }
 
-type MapMustConvertTest[TypeInput safecast.Input, TypeOutput safecast.Number] struct {
+type MapMustConvertTest[TypeInput safecast.Number, TypeOutput safecast.Number] struct {
 	Input          TypeInput
 	ExpectedOutput TypeOutput
 	ExpectedError  error
@@ -634,7 +467,6 @@ func TestMustConvert(t *testing.T) {
 		for name, tt := range map[string]TestRunner{
 			"negative": MapMustConvertTest[int, uint8]{Input: -1, ExpectedError: safecast.ErrExceedMinimumValue},
 			"overflow": MapMustConvertTest[int, uint8]{Input: math.MaxInt, ExpectedError: safecast.ErrExceedMaximumValue},
-			"string":   MapMustConvertTest[string, uint8]{Input: "cats", ExpectedError: safecast.ErrStringConversion},
 		} {
 			t.Run(name, func(t *testing.T) {
 				tt.Run(t)
@@ -645,9 +477,7 @@ func TestMustConvert(t *testing.T) {
 	t.Run("no panic", func(t *testing.T) {
 		for name, tt := range map[string]TestRunner{
 			"number": MapMustConvertTest[int, uint8]{Input: 42, ExpectedOutput: 42},
-			"string": MapMustConvertTest[string, uint8]{Input: "42", ExpectedOutput: 42},
 			"float":  MapMustConvertTest[float64, uint8]{Input: 42.0, ExpectedOutput: 42},
-			"octal":  MapMustConvertTest[string, uint8]{Input: "0o52", ExpectedOutput: 42},
 		} {
 			t.Run(name, func(t *testing.T) {
 				tt.Run(t)
@@ -656,7 +486,7 @@ func TestMustConvert(t *testing.T) {
 	})
 }
 
-type MapRequireConvertTest[TypeInput safecast.Input, TypeOutput safecast.Number] struct {
+type MapRequireConvertTest[TypeInput safecast.Number, TypeOutput safecast.Number] struct {
 	Input               TypeInput
 	ExpectedOutput      TypeOutput
 	ExpectedTestFailure bool
@@ -689,9 +519,7 @@ func TestRequireConvert(t *testing.T) {
 	t.Run("no conversion error", func(t *testing.T) {
 		for name, tt := range map[string]TestRunner{
 			"number": MapRequireConvertTest[int, uint8]{Input: 42, ExpectedOutput: 42},
-			"string": MapRequireConvertTest[string, uint8]{Input: "42", ExpectedOutput: 42},
 			"float":  MapRequireConvertTest[float64, uint8]{Input: 42.0, ExpectedOutput: 42},
-			"octal":  MapRequireConvertTest[string, uint8]{Input: "0o52", ExpectedOutput: 42},
 		} {
 			t.Run(name, func(t *testing.T) {
 				tt.Run(t)
@@ -703,7 +531,6 @@ func TestRequireConvert(t *testing.T) {
 		for name, tt := range map[string]TestRunner{
 			"negative": MapRequireConvertTest[int, uint8]{Input: -1, ExpectedTestFailure: true},
 			"overflow": MapRequireConvertTest[int, uint8]{Input: math.MaxInt, ExpectedTestFailure: true},
-			"string":   MapRequireConvertTest[string, uint8]{Input: "cats", ExpectedTestFailure: true},
 		} {
 			t.Run(name, func(t *testing.T) {
 				tt.Run(t)
@@ -751,10 +578,10 @@ func (m mockTestingTExample) Failed() bool {
 func ExampleRequireConvert_failure() {
 	t := new(mockTestingTExample) // use *testing.T, *testing.B, or *testing.F here
 
-	_ = safecast.RequireConvert[uint8](t, "foo")
+	_ = safecast.RequireConvert[uint8](t, -1)
 	// here an error is raised via [testing.T.Fatal]
 
 	// Output:
 	// --- FAIL:
-	// 	conversion issue: cannot convert from `foo` to uint8 (base auto-detection)
+	// 	conversion issue: -1 (int) is less than 0 (uint8): minimum value for this type exceeded
 }

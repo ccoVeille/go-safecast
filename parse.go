@@ -10,7 +10,7 @@ import (
 //
 // # Concept
 //
-// Parse is a convenient wrapper around [strconv.ParseInt], [strconv.ParseUUint], and [strconv.ParseFloat].
+// Parse is a convenient wrapper around [strconv.ParseInt], [strconv.ParseUint], and [strconv.ParseFloat].
 //
 // # Behavior
 //
@@ -33,15 +33,9 @@ import (
 //
 // Use one of the provided option functions to set the desired behavior.
 // See [WithBaseDecimal], [WithBaseHexadecimal], [WithBaseOctal], [WithBaseBinary], and [WithBaseAutoDetection].
-func Parse[NumOut Number](input string, opts ...ParseOption) (converted NumOut, err error) {
+func Parse[NumOut Number](s string, opts ...ParseOption) (converted NumOut, err error) {
 	options := newParseOptions(opts...)
 	numberBase := options.numberBase
-
-	s := input
-	if options.legacyMode {
-		// Trim spaces for legacy mode
-		s = strings.TrimSpace(s)
-	}
 
 	// naive auto-detection of the sign
 	isNegative := strings.HasPrefix(s, "-")
@@ -61,7 +55,7 @@ func Parse[NumOut Number](input string, opts ...ParseOption) (converted NumOut, 
 			// If the error is a range error, wrap it in an errorHelper
 			return 0, errorHelper[NumOut]{
 				numberBase: numberBase,
-				value:      input,
+				value:      s,
 				err:        errParseFloat,
 			}
 		}
@@ -80,7 +74,7 @@ func Parse[NumOut Number](input string, opts ...ParseOption) (converted NumOut, 
 			}
 			return 0, errorHelper[NumOut]{
 				numberBase: numberBase,
-				value:      input,
+				value:      s,
 				err:        errParseInt,
 			}
 		}
@@ -96,7 +90,7 @@ func Parse[NumOut Number](input string, opts ...ParseOption) (converted NumOut, 
 		}
 		return 0, errorHelper[NumOut]{
 			numberBase: numberBase,
-			value:      input,
+			value:      s,
 			err:        errParseUint,
 		}
 	}
@@ -168,7 +162,6 @@ func (nb numberBase) String() string {
 
 type parseConfig struct {
 	numberBase numberBase
-	legacyMode bool
 }
 
 // WithBaseDecimal sets the number base to decimal (base 10) when used with [Parse].
@@ -226,11 +219,5 @@ func WithBaseBinary() ParseOption {
 func WithBaseAutoDetection() ParseOption {
 	return func(pc *parseConfig) {
 		pc.numberBase = baseAuto
-	}
-}
-
-func withLegacyMode() ParseOption {
-	return func(pc *parseConfig) {
-		pc.legacyMode = true
 	}
 }
