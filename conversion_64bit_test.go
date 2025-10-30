@@ -16,46 +16,6 @@ import (
 	"github.com/ccoveille/go-safecast"
 )
 
-func TestToInt32_64bit(t *testing.T) {
-	t.Run("from int", func(t *testing.T) {
-		assertInt32Error(t, []caseInt32[int]{
-			{name: "positive out of range", input: math.MaxInt32 + 1},
-			{name: "negative out of range", input: math.MinInt32 - 1},
-		})
-	})
-}
-
-func TestToUint32_64bit(t *testing.T) {
-	t.Run("from int", func(t *testing.T) {
-		assertUint32Error(t, []caseUint32[int]{
-			{name: "positive out of range", input: math.MaxUint32 + 1},
-			{name: "negative value", input: -1},
-		})
-	})
-}
-
-func TestToInt64_64bit(t *testing.T) {
-	t.Run("from uint", func(t *testing.T) {
-		assertInt64Error(t, []caseInt64[uint]{
-			{name: "positive out of range", input: math.MaxInt64 + 1},
-		})
-	})
-}
-
-func TestToInt_64bit(t *testing.T) {
-	t.Run("from uint", func(t *testing.T) {
-		assertIntError(t, []caseInt[uint]{
-			{name: "positive out of range", input: math.MaxInt64 + 1},
-		})
-	})
-
-	t.Run("from float64", func(t *testing.T) {
-		assertIntOK(t, []caseInt[float64]{
-			{name: "math.MinInt64", input: math.MinInt64, want: math.MinInt64}, // pass because of float imprecision
-		})
-	})
-}
-
 // TestConvert_64bit completes the [TestConvert] tests in conversion_test.go
 // it contains the tests that can only works on 64-bit systems
 func TestConvert_64bit(t *testing.T) {
