@@ -2,7 +2,6 @@ package safecast_test
 
 import (
 	"fmt"
-	"math"
 
 	"github.com/ccoveille/go-safecast"
 )
