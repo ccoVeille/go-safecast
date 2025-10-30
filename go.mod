@@ -1,3 +1,4 @@
+// Deprecated: use github.com/ccoveille/go-safecast/v2 instead.
 module github.com/ccoveille/go-safecast
 
 go 1.21
