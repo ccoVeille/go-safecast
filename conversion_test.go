@@ -204,6 +204,13 @@ func TestConvert(t *testing.T) {
 		"float64 to uint64":  MapTest[float64, uint64]{Input: 42, ExpectedOutput: 42},
 		"float64 to float32": MapTest[float64, float32]{Input: 42, ExpectedOutput: 42},
 		"float64 to float64": MapTest[float64, float64]{Input: 42, ExpectedOutput: 42},
+
+		"uintptr to uint":  MapTest[uintptr, uint]{Input: uintptr(42), ExpectedOutput: uint(42)},
+		"uint to uintptr":  MapTest[uint, uintptr]{Input: uint(42), ExpectedOutput: uintptr(42)},
+		"int8 to uintptr":  MapTest[int8, uintptr]{Input: int8(42), ExpectedOutput: uintptr(42)},
+		"int16 to uintptr": MapTest[int16, uintptr]{Input: int16(42), ExpectedOutput: uintptr(42)},
+		"int32 to uintptr": MapTest[int32, uintptr]{Input: int32(42), ExpectedOutput: uintptr(42)},
+		"int64 to uintptr": MapTest[int64, uintptr]{Input: int64(42), ExpectedOutput: uintptr(42)},
 	} {
 		t.Run(name, func(t *testing.T) {
 			c.Run(t)
@@ -310,6 +317,11 @@ func TestConvert(t *testing.T) {
 			Input:         float64(math.MaxUint64 * 1.01),
 			ExpectedError: safecast.ErrExceedMaximumValue,
 		},
+
+		"upper bound overflows for uintptr": MapTest[float64, uintptr]{
+			Input:         float64(math.MaxUint64 * 1.01), // uintptr is at least uint32, but can be uint64
+			ExpectedError: safecast.ErrExceedMaximumValue,
+		},
 	} {
 		t.Run(name, func(t *testing.T) {
 			c.Run(t)
@@ -367,6 +379,11 @@ func TestConvert(t *testing.T) {
 		},
 
 		"negative overflows uint64": MapTest[int, uint64]{
+			Input:         -42,
+			ExpectedError: safecast.ErrExceedMinimumValue,
+		},
+
+		"negative overflows uintptr": MapTest[int, uintptr]{
 			Input:         -42,
 			ExpectedError: safecast.ErrExceedMinimumValue,
 		},

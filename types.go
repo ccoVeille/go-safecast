@@ -6,7 +6,7 @@ import (
 
 // Number is a constraint for all integers and floats
 type Number interface {
-	~int | ~int8 | ~int16 | ~int32 | ~int64 | ~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64 | ~float32 | ~float64
+	~int | ~int8 | ~int16 | ~int32 | ~int64 | ~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64 | ~float32 | ~float64 | ~uintptr
 
 	// TODO(ccoVeille): consider using complex, but not sure if there is a need
 }
