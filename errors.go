@@ -48,6 +48,13 @@ var ErrUnsupportedConversion = errors.New("unsupported type")
 // [ErrConversionIssue] is also wrapped when this error is returned.
 var ErrStringConversion = errors.New("cannot convert from string")
 
+// ErrDecimalLoss is an error for when decimal loss occurs during conversion.
+//
+// Examples include converting 3.14 to int.
+//
+// [ErrConversionIssue] is also wrapped when this error is returned.
+var ErrDecimalLoss = errors.New("decimal loss during conversion")
+
 // errorHelper is a helper struct for error messages
 // It is used to wrap other errors, and provides additional information
 type errorHelper[NumOut Number] struct {

@@ -18,6 +18,7 @@ import (
 
 type MapTest[TypeInput safecast.Number, TypeOutput safecast.Number] struct {
 	Input          TypeInput
+	Options        []safecast.ConvertOption
 	ExpectedOutput TypeOutput
 	ExpectedError  error
 	ErrorContains  string
@@ -36,7 +37,7 @@ func (mt MapTest[I, O]) Run(t *testing.T) {
 		}
 	}(t)
 
-	out, err := safecast.Convert[O](mt.Input)
+	out, err := safecast.Convert[O](mt.Input, mt.Options...)
 	if mt.ExpectedError != nil {
 		requireErrorIs(t, err, safecast.ErrConversionIssue)
 		requireErrorIs(t, err, mt.ExpectedError)
@@ -432,6 +433,46 @@ func TestConvert(t *testing.T) {
 			})
 		}
 	})
+
+	t.Run("float to int rounding", func(t *testing.T) {
+		t.Run("without decimal loss", func(t *testing.T) {
+			for name, tt := range map[string]TestRunner{
+				"float32": MapTest[float32, int]{
+					Input:          3.14,
+					ExpectedOutput: 3,
+				},
+				"float64": MapTest[float64, int]{
+					Input:          3.14,
+					ExpectedOutput: 3,
+				},
+			} {
+				t.Run(name, func(t *testing.T) {
+					tt.Run(t)
+				})
+			}
+		})
+
+		t.Run("with decimal loss", func(t *testing.T) {
+			for name, tt := range map[string]TestRunner{
+				"float32": MapTest[float32, int]{
+					Input:          3.14,
+					Options:        []safecast.ConvertOption{safecast.WithDecimalLossReport()},
+					ExpectedOutput: 3,
+					ExpectedError:  safecast.ErrDecimalLoss,
+				},
+				"float64": MapTest[float64, int]{
+					Input:          3.14,
+					Options:        []safecast.ConvertOption{safecast.WithDecimalLossReport()},
+					ExpectedOutput: 3,
+					ExpectedError:  safecast.ErrDecimalLoss,
+				},
+			} {
+				t.Run(name, func(t *testing.T) {
+					tt.Run(t)
+				})
+			}
+		})
+	})
 }
 
 type MapMustConvertTest[TypeInput safecast.Number, TypeOutput safecast.Number] struct {
@@ -601,4 +642,18 @@ func ExampleRequireConvert_failure() {
 	// Output:
 	// --- FAIL:
 	// 	conversion issue: -1 (int) is less than 0 (uint8): minimum value for this type exceeded
+}
+
+func ExampleWithDecimalLossReport() {
+	// By default, converting from float to int does not report decimal loss
+	val1, err1 := safecast.Convert[int](3.14)
+	fmt.Println(val1, err1)
+
+	// Using the WithDecimalLossReport option, decimal loss is reported as an error
+	val2, err2 := safecast.Convert[int](3.14, safecast.WithDecimalLossReport())
+	fmt.Println(val2, err2)
+
+	// Output:
+	// 3 <nil>
+	// 3 conversion issue: decimal loss during conversion
 }

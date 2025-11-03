@@ -106,4 +106,9 @@ func TestErrorMessage(t *testing.T) {
 	requireErrorIs(t, err, safecast.ErrConversionIssue)
 	requireErrorIs(t, err, safecast.ErrExceedMinimumValue)
 	requireErrorContains(t, err, "than -128 (int8)")
+
+	_, err = safecast.Convert[int8](3.14, safecast.WithDecimalLossReport())
+	requireErrorIs(t, err, safecast.ErrConversionIssue)
+	requireErrorIs(t, err, safecast.ErrDecimalLoss)
+	requireErrorContains(t, err, "decimal loss")
 }

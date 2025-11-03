@@ -55,7 +55,7 @@ func RequireConvert[NumOut Number, NumIn Number](t TestingT, orig NumIn) (conver
 // # General errors wrapped on conversion failure:
 //
 //   - [ErrConversionIssue] is always wrapped in the returned error when [Convert] fails (example "abc", -1, or 1000 to uint8).
-func Convert[NumOut Number, NumIn Number](orig NumIn) (NumOut, error) {
+func Convert[NumOut Number, NumIn Number](orig NumIn, opts ...ConvertOption) (NumOut, error) {
 	converted := NumOut(orig)
 	if isFloat64[NumIn]() {
 		floatOrig := float64(orig)
@@ -69,6 +69,8 @@ func Convert[NumOut Number, NumIn Number](orig NumIn) (NumOut, error) {
 			}
 		}
 	}
+
+	config := newConvertOptions(opts...)
 
 	if isFloat64[NumOut]() {
 		// float64 cannot overflow, so we don't have to worry about it
@@ -103,6 +105,15 @@ func Convert[NumOut Number, NumIn Number](orig NumIn) (NumOut, error) {
 		return converted, getRangeError[NumOut](orig)
 	}
 
+	if config.reportDecimalLoss && isFloat[NumIn]() && !isFloat[NumOut]() {
+		if orig != cast {
+			return converted, errorHelper[NumOut]{
+				value: orig,
+				err:   ErrDecimalLoss,
+			}
+		}
+	}
+
 	return converted, nil
 }
 
@@ -115,5 +126,38 @@ func getRangeError[NumOut Number, NumIn Number](value NumIn) error {
 	return errorHelper[NumOut]{
 		value: value,
 		err:   err,
+	}
+}
+
+type convertConfig struct {
+	reportDecimalLoss bool
+}
+
+// ConvertOption is a function type used to set options for the [Convert] function.
+type ConvertOption func(*convertConfig)
+
+func newConvertOptions(opts ...ConvertOption) *convertConfig {
+	po := &convertConfig{
+		reportDecimalLoss: false,
+	}
+
+	for _, opt := range opts {
+		opt(po)
+	}
+	return po
+}
+
+// WithDecimalLossReport is a [ConvertOption] that enables reporting of decimal loss
+// when converting from a floating-point type to an integer type.
+//
+// When this option is used, if the conversion results in loss of decimal information,
+// the returned error will wrap [ErrDecimalLoss].
+//
+// Example:
+//
+//	value, err := Convert[int](3.14, WithDecimalLossReport())
+func WithDecimalLossReport() ConvertOption {
+	return func(cfg *convertConfig) {
+		cfg.reportDecimalLoss = true
 	}
 }
