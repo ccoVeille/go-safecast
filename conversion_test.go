@@ -466,6 +466,22 @@ func TestConvert(t *testing.T) {
 					ExpectedOutput: 3,
 					ExpectedError:  safecast.ErrDecimalLoss,
 				},
+				"tiny_float32": MapTest[float32, int]{
+					Input:          math.SmallestNonzeroFloat32,
+					ExpectedOutput: 0,
+				},
+				"tiny_negative_float32": MapTest[float32, int]{
+					Input:          -math.SmallestNonzeroFloat32,
+					ExpectedOutput: 0,
+				},
+				"tiny_float64": MapTest[float32, int]{
+					Input:          math.SmallestNonzeroFloat64,
+					ExpectedOutput: 0,
+				},
+				"tiny_negative_float64": MapTest[float32, int]{
+					Input:          -math.SmallestNonzeroFloat64,
+					ExpectedOutput: 0,
+				},
 			} {
 				t.Run(name, func(t *testing.T) {
 					tt.Run(t)
