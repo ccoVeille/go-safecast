@@ -89,12 +89,19 @@ func Convert[NumOut Number, NumIn Number](orig NumIn, opts ...ConvertOption) (Nu
 		return converted, getRangeError[NumOut](orig)
 	}
 
-	if !sameSign(orig, converted) {
+	// For floats, truncate to integer first before comparing signs
+	// to handle small fractional values like -1e-100 that truncate to 0
+	base := orig
+	if isFloat[NumIn]() {
+		base = NumIn(math.Trunc(float64(orig)))
+		// If truncated value is 0, sign comparison is not applicable
+		if base != 0 && !sameSign(base, converted) {
+			return converted, getRangeError[NumOut](orig)
+		}
+	} else if !sameSign(orig, converted) {
 		return converted, getRangeError[NumOut](orig)
 	}
 
-	// and compare
-	base := orig
 	if isFloat[NumIn]() {
 		base = NumIn(math.Trunc(float64(orig)))
 	}
