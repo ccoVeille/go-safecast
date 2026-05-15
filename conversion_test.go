@@ -474,11 +474,11 @@ func TestConvert(t *testing.T) {
 					Input:          -math.SmallestNonzeroFloat32,
 					ExpectedOutput: 0,
 				},
-				"tiny_float64": MapTest[float32, int]{
+				"tiny_float64": MapTest[float64, int]{
 					Input:          math.SmallestNonzeroFloat64,
 					ExpectedOutput: 0,
 				},
-				"tiny_negative_float64": MapTest[float32, int]{
+				"tiny_negative_float64": MapTest[float64, int]{
 					Input:          -math.SmallestNonzeroFloat64,
 					ExpectedOutput: 0,
 				},
