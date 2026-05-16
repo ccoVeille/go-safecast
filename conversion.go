@@ -49,7 +49,7 @@ func RequireConvert[NumOut Number, NumIn Number](t TestingT, orig NumIn) (conver
 //
 // # Errors when conversion is not possible, the following errors are wrapped in the returned error:
 //
-//   - [ErrorUnsupportedConversion] when the conversion is not possible for the desired type (example: NaN to int).
+//   - [ErrUnsupportedConversion] when the conversion is not possible for the desired type (example: NaN to int).
 //   - [ErrStringConversion] when the conversion from string fails (example: "abc" to int).
 //
 // # General errors wrapped on conversion failure:
