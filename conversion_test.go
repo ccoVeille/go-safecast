@@ -445,6 +445,58 @@ func TestConvert(t *testing.T) {
 					Input:          3.14,
 					ExpectedOutput: 3,
 				},
+				"truncate_for_positive_float32": MapTest[float32, int]{
+					Input:          2.9,
+					ExpectedOutput: 2,
+				},
+				"truncate_for_positive_float64": MapTest[float64, int]{
+					Input:          2.9,
+					ExpectedOutput: 2,
+				},
+				"truncate_for_negative_float32": MapTest[float32, int]{
+					Input:          -2.9,
+					ExpectedOutput: -2,
+				},
+				"truncate_for_negative_float64": MapTest[float64, int]{
+					Input:          -2.9,
+					ExpectedOutput: -2,
+				},
+				"truncate_negative_decimal_less_than_one_float64": MapTest[float64, int]{
+					Input:          -0.99,
+					ExpectedOutput: 0,
+				},
+				"truncate_negative_decimal_less_than_one_float32": MapTest[float32, int]{
+					Input:          -0.99,
+					ExpectedOutput: 0,
+				},
+				"truncate_near_overflow_float64_to_int8": MapTest[float64, int8]{
+					Input:          127.9,
+					ExpectedOutput: 127,
+				},
+				"truncate_near_underflow_float64_to_int8": MapTest[float64, int8]{
+					Input:          -128.9,
+					ExpectedOutput: -128,
+				},
+				"detect_underflow_before_sign_to_int8": MapTest[float64, int8]{
+					// this one is important because int8(-256.0) = 0
+					// so we check the underflow is not leading to valid output
+					Input:         -256.0,
+					ExpectedError: safecast.ErrExceedMinimumValue,
+				},
+				"detect_underflow_before_sign_to_uint8": MapTest[float64, uint8]{
+					// this one is important because uint8(-128.0) = 0
+					// so we check the underflow is not leading to valid output
+					Input:         -128.0,
+					ExpectedError: safecast.ErrExceedMinimumValue,
+				},
+				"negative zero fits int": MapTest[float64, int]{
+					Input:          negativeZero,
+					ExpectedOutput: 0,
+				},
+				"negative zero fits uint": MapTest[float64, uint]{
+					Input:          negativeZero,
+					ExpectedOutput: 0,
+				},
 				"tiny_float32": MapTest[float32, int]{
 					Input:          math.SmallestNonzeroFloat32,
 					ExpectedOutput: 0,
