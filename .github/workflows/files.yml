@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v7
 
       - name: actionlint
-        uses: raven-actions/actionlint@v2.1.2
+        uses: raven-actions/actionlint@v2.2.0
 
   yamllint:
     runs-on: ubuntu-latest
