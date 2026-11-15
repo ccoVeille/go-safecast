@@ -541,6 +541,54 @@ func TestConvert(t *testing.T) {
 			}
 		})
 	})
+
+	t.Run("int to float rounding", func(t *testing.T) {
+		t.Run("without precision loss", func(t *testing.T) {
+			for name, tt := range map[string]TestRunner{
+				"int32 to float32": MapTest[int32, float32]{
+					Input:          42,
+					ExpectedOutput: 42,
+				},
+				"int64 to float32": MapTest[int64, float32]{
+					Input:          16777216,
+					ExpectedOutput: 16777216,
+				},
+				"int64 to float64": MapTest[int64, float64]{
+					Input:          9007199254740992,
+					ExpectedOutput: 9007199254740992,
+				},
+			} {
+				t.Run(name, func(t *testing.T) {
+					tt.Run(t)
+				})
+			}
+		})
+
+		t.Run("with precision loss", func(t *testing.T) {
+			for name, tt := range map[string]TestRunner{
+				"int32 to float32": MapTest[int32, float32]{
+					Input:         16777217,
+					ExpectedError: safecast.ErrPrecisionLoss,
+				},
+				"int64 to float32": MapTest[int64, float32]{
+					Input:         16777217,
+					ExpectedError: safecast.ErrPrecisionLoss,
+				},
+				"int64 to float64": MapTest[int64, float64]{
+					Input:         9007199254740993,
+					ExpectedError: safecast.ErrPrecisionLoss,
+				},
+				"negative int64 to float32": MapTest[int64, float32]{
+					Input:         -16777217,
+					ExpectedError: safecast.ErrPrecisionLoss,
+				},
+			} {
+				t.Run(name, func(t *testing.T) {
+					tt.Run(t)
+				})
+			}
+		})
+	})
 }
 
 type MapMustConvertTest[TypeInput safecast.Number, TypeOutput safecast.Number] struct {
