@@ -47,6 +47,11 @@ func RequireConvert[NumOut Number, NumIn Number](t TestingT, orig NumIn) (conver
 //   - [ErrExceedMaximumValue] when the value exceeds the maximum value of the desired type (example: 1000 to uint8).
 //   - [ErrExceedMinimumValue] when the value is less than the minimum value of the desired type (example: -1 to uint16).
 //
+// # Errors when conversion results in data loss, the following errors are wrapped in the returned error:
+//
+//   - [ErrPrecisionLoss] when an integer cannot be represented exactly by the desired floating-point type (example: 16777217 to float32).
+//   - [ErrDecimalLoss] when converting a floating-point value to an integer causes decimal loss and [WithDecimalLossReport] is enabled (example: 3.14 to int).
+//
 // # Errors when conversion is not possible, the following errors are wrapped in the returned error:
 //
 //   - [ErrUnsupportedConversion] when the conversion is not possible for the desired type (example: NaN to int).
@@ -73,18 +78,16 @@ func Convert[NumOut Number, NumIn Number](orig NumIn, opts ...ConvertOption) (Nu
 	config := newConvertOptions(opts...)
 
 	if isFloat64[NumOut]() {
-		// float64 cannot overflow, so we don't have to worry about it
-		return converted, nil
+		// float64 cannot overflow, so we don't have to worry about it, but it might have precision loss
+		return checkIntegerToFloatPrecisionLoss(orig, converted)
 	}
 
 	if isFloat32[NumOut]() {
 		// check boundary
 		if math.Abs(float64(orig)) < math.MaxFloat32 {
-			// the value is within float32 range, there is no overflow
-			return converted, nil
+			// the value is within float32 range, there is no overflow, but it might have precision loss
+			return checkIntegerToFloatPrecisionLoss(orig, converted)
 		}
-
-		// TODO: check for numbers close to math.MaxFloat32
 
 		return converted, getRangeError[NumOut](orig)
 	}
