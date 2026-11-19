@@ -55,6 +55,13 @@ var ErrStringConversion = errors.New("cannot convert from string")
 // [ErrConversionIssue] is also wrapped when this error is returned.
 var ErrDecimalLoss = errors.New("decimal loss during conversion")
 
+// ErrPrecisionLoss is an error for when numeric precision is lost during conversion.
+//
+// Examples include converting 16777217 to float32.
+//
+// [ErrConversionIssue] is also wrapped when this error is returned.
+var ErrPrecisionLoss = errors.New("precision loss during conversion")
+
 // errorHelper is a helper struct for error messages
 // It is used to wrap other errors, and provides additional information
 type errorHelper[NumOut Number] struct {
@@ -82,6 +89,9 @@ func (e errorHelper[NumOut]) Error() string {
 		}
 		targetType := NumOut(0)
 		return fmt.Sprintf("%s: cannot convert from %#q to %T%s", errMessage, e.value, targetType, baseInfoSuffix)
+	case errors.Is(e.err, ErrPrecisionLoss):
+		targetType := NumOut(0)
+		errMessage = fmt.Sprintf("%s: %v (%T) loses precision when converted to %T", errMessage, e.value, e.value, targetType)
 	}
 
 	if e.err != nil {
